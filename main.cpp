@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2013, The Linux Foundation. All rights reserved.
+ * Copyright (c) 2020, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
- * *    * Redistributions of source code must retain the above copyright
+ *     * Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
  *     * Redistributions in binary form must reproduce the above
  *       copyright notice, this list of conditions and the following
@@ -26,40 +26,26 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#define LOG_NIDEBUG 0
 
-#include <errno.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <dlfcn.h>
-#include <stdlib.h>
+#include "Power.h"
 
-#define LOG_TAG "QTI PowerHAL"
-#include <utils/Log.h>
-#include <hardware/hardware.h>
-#include <hardware/power.h>
+#include <android-base/logging.h>
+#include <android/binder_manager.h>
+#include <android/binder_process.h>
 
-#include "utils.h"
-#include "metadata-defs.h"
-#include "hint-data.h"
-#include "performance.h"
-#include "power-common.h"
+using aidl::android::hardware::power::impl::Power;
 
-static int display_hint_sent;
-
-int power_hint_override(struct power_module *module, power_hint_t hint, void *data)
-{
-    switch(hint) {
-        case POWER_HINT_INTERACTION:
-        {
-            int resources[] = {0x702, 0x20B, 0x30B};
-            int duration = 3000;
-
-            interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
-            return HINT_HANDLED;
-        }
+int main() {
+    ABinderProcess_setThreadPoolMaxThreadCount(0);
+    std::shared_ptr<Power> vib = ndk::SharedRefBase::make<Power>();
+    const std::string instance = std::string() + Power::descriptor + "/default";
+    LOG(INFO) << "Instance " << instance;
+    binder_status_t status = AServiceManager_addService(vib->asBinder().get(), instance.c_str());
+    LOG(INFO) << "Status " << status;
+    if(status != STATUS_OK){
+        LOG(ERROR) << "Could not register" << instance;
     }
-    return HINT_NONE;
+
+    ABinderProcess_joinThreadPool();
+    return 1;  // should not reach
 }
