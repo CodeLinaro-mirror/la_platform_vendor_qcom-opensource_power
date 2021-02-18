@@ -98,7 +98,7 @@ int power_hint_override(struct power_module *module, power_hint_t hint, void *da
     return HINT_HANDLED;
 }
 
-int  set_interactive_override(struct power_module *module, int on)
+int  set_interactive_override(int on)
 {
     char *s = on? "1" : "0";
     int rc = -1;

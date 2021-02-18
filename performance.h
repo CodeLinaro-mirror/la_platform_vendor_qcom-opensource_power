@@ -1,4 +1,4 @@
-/* Copyright (c) 2012, 2014, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012, 2014, 2020 The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -184,6 +184,7 @@ enum INTERACTIVE_OPCODES {
 
 enum INTERACTIVE_HISPEED_FREQ_LVL {
     HS_FREQ_1026 = 0xF0A,
+    HS_FREQ_800  = 0xF08,
 };
 
 enum INTERACTIVE_HISPEED_LOAD_LVL {
@@ -259,6 +260,15 @@ enum CPU6_MAX_FREQ_LVL {
 enum CPU7_MAX_FREQ_LVL {
     CPU7_MAX_FREQ_NONTURBO_MAX = 0x260A,
 };
+
+enum SCHED_PREFER_IDLE {
+    SCHED_PREFER_IDLE_DIS = 0x3E01,
+};
+
+enum SCHED_MIGRATE_COST_CHNG {
+    SCHED_MIGRATE_COST_SET = 0x3F01,
+};
+
 
 #ifdef __cplusplus
 }
