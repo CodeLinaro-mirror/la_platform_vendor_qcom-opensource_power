@@ -16,6 +16,10 @@ ifeq ($(call is-board-platform-in-list,msm8937), true)
 LOCAL_SRC_FILES += power-8937.c
 endif
 
+ifeq ($(call is-board-platform-in-list,monaco), true)
+LOCAL_SRC_FILES += power-monaco.c
+endif
+
 ifeq ($(TARGET_USES_INTERACTION_BOOST),true)
     LOCAL_CFLAGS += -DINTERACTION_BOOST
 endif
