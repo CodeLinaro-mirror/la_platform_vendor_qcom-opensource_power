@@ -47,7 +47,7 @@
 #include "performance.h"
 #include "power-common.h"
 
-#define BGRSB_ENABLE_PATH "/sys/devices/platform/soc/soc:qcom,bg-rsb/enable"
+#define SLATERSB_ENABLE_PATH "/sys/devices/platform/soc/soc:qcom,slate-rsb/enable"
 
 #define MAX_RETRY 10
 
@@ -55,4 +55,15 @@
 int power_hint_override(struct power_module *module, power_hint_t hint, void *data)
 {
     return HINT_HANDLED;
+}
+
+int  set_interactive_override(int on)
+{
+     char *s = on? "1" : "0";
+     int rc = -1;
+
+     rc = sysfs_write(SLATERSB_ENABLE_PATH, s);
+     if(rc != 0)
+         ALOGE("RSB command is not processed\n");
+     return HINT_HANDLED;
 }
