@@ -7,7 +7,7 @@ ifeq ($(call is-vendor-board-platform,QCOM),true)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_RELATIVE_PATH := hw
-ifneq ( ,$(filter 11 R ,$(PLATFORM_VERSION)))
+ifneq ( ,$(filter 11 R 13 T,$(PLATFORM_VERSION)))
 LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils android.hardware.power-ndk_platform libbinder_ndk
 else
 LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils android.hardware.power-V1-ndk_platform libbinder_ndk
