@@ -7,10 +7,13 @@ ifeq ($(call is-vendor-board-platform,QCOM),true)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_RELATIVE_PATH := hw
-ifneq ( ,$(filter 11 R 13 T,$(PLATFORM_VERSION)))
-LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils android.hardware.power-ndk_platform libbinder_ndk
+
+LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils libbinder_ndk
+
+ifeq (,$(filter Tiramisu T 13, $(PLATFORM_VERSION)))
+   LOCAL_SHARED_LIBRARIES += android.hardware.power-V1-ndk
 else
-LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils android.hardware.power-V1-ndk_platform libbinder_ndk
+   LOCAL_SHARED_LIBRARIES += android.hardware.power-V1-ndk_platform
 endif
 LOCAL_HEADER_LIBRARIES += libutils_headers
 LOCAL_HEADER_LIBRARIES += libhardware_headers
