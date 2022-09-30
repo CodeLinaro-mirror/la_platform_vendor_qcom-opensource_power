@@ -13,7 +13,7 @@ LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils libbin
 ifneq ( ,$(filter S 12,$(PLATFORM_VERSION)))
     LOCAL_SHARED_LIBRARIES += android.hardware.power-V1-ndk_platform
 else ifneq ( ,$(filter T 13 Tiramisu,$(PLATFORM_VERSION)))
-    LOCAL_SHARED_LIBRARIES += android.hardware.power-V1-ndk
+    LOCAL_SHARED_LIBRARIES += android.hardware.power-V3-ndk
 else
     LOCAL_SHARED_LIBRARIES += android.hardware.power-ndk_platform
 endif
