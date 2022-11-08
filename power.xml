@@ -57,7 +57,7 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 <manifest version="1.0" type="device">
     <hal format="aidl">
         <name>android.hardware.power</name>
-        <fqname>IPower/default</fqname>
         <version>3</version>
+        <fqname>IPower/default</fqname>
     </hal>
 </manifest>
