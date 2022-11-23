@@ -33,6 +33,10 @@ LOCAL_INIT_RC := android.hardware.power-service.rc
 LOCAL_MODULE_TAGS := optional
 LOCAL_CFLAGS += -Wno-unused-parameter -Wno-unused-variable
 LOCAL_VENDOR_MODULE := true
-LOCAL_VINTF_FRAGMENTS := power.xml
+ifeq ($(shell expr $(SHIPPING_API_LEVEL) \>= 33), 1)
+    LOCAL_VINTF_FRAGMENTS := power_new.xml
+else
+    LOCAL_VINTF_FRAGMENTS := power.xml
+endif
 include $(BUILD_EXECUTABLE)
 endif
