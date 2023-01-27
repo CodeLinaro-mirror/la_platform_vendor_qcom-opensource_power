@@ -25,6 +25,11 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Changes from Qualcomm Innovation Center are provided under the following license:
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
 
 #define LOG_TAG "QTI PowerHAL"
@@ -116,6 +121,19 @@ ndk::ScopedAStatus Power::isBoostSupported(Boost type, bool* _aidl_return) {
     *_aidl_return = false;
     return ndk::ScopedAStatus::ok();
 }
+
+#ifdef ENABLE_POWER_AIDL_V2_APIS
+ndk::ScopedAStatus Power::createHintSession(int32_t, int32_t, const std::vector<int32_t>&, int64_t,
+                                            std::shared_ptr<IPowerHintSession>* _aidl_return) {
+    *_aidl_return = nullptr;
+    return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+}
+
+ndk::ScopedAStatus Power::getHintSessionPreferredRate(int64_t* outNanoseconds) {
+    *outNanoseconds = -1;
+    return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+}
+#endif // ENABLE_POWER_AIDL_V2_APIS
 
 }  // namespace impl
 }  // namespace power
