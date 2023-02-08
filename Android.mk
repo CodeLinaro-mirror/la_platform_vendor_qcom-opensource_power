@@ -12,10 +12,14 @@ LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils libbin
 
 ifneq ( ,$(filter S 12,$(PLATFORM_VERSION)))
     LOCAL_SHARED_LIBRARIES += android.hardware.power-V1-ndk_platform
+    LOCAL_VINTF_FRAGMENTS := power.xml
 else ifneq ( ,$(filter T 13 Tiramisu,$(PLATFORM_VERSION)))
-    LOCAL_SHARED_LIBRARIES += android.hardware.power-V1-ndk
+    LOCAL_SHARED_LIBRARIES += android.hardware.power-V2-ndk
+    LOCAL_VINTF_FRAGMENTS := power-v2.xml
+    LOCAL_CFLAGS += -DENABLE_POWER_AIDL_V2_APIS
 else
     LOCAL_SHARED_LIBRARIES += android.hardware.power-ndk_platform
+    LOCAL_VINTF_FRAGMENTS := power.xml
 endif
 
 LOCAL_HEADER_LIBRARIES += libutils_headers
@@ -94,7 +98,6 @@ LOCAL_INIT_RC := android.hardware.power-service.rc
 LOCAL_MODULE_TAGS := optional
 LOCAL_CFLAGS += -Wno-unused-parameter -Wno-unused-variable
 LOCAL_VENDOR_MODULE := true
-LOCAL_VINTF_FRAGMENTS := power.xml
 include $(BUILD_EXECUTABLE)
 endif
 
