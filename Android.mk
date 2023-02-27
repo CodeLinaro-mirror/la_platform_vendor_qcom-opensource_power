@@ -13,7 +13,7 @@ LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils libbin
 ifneq ( ,$(filter S 12,$(PLATFORM_VERSION)))
     LOCAL_SHARED_LIBRARIES += android.hardware.power-V1-ndk_platform
     LOCAL_VINTF_FRAGMENTS := power.xml
-else ifneq ( ,$(filter T 13 Tiramisu,$(PLATFORM_VERSION)))
+else ifneq ( ,$(filter T 13 Tiramisu U 14 UpsideDownCake,$(PLATFORM_VERSION)))
     LOCAL_SHARED_LIBRARIES += android.hardware.power-V2-ndk
     LOCAL_VINTF_FRAGMENTS := power-v2.xml
     LOCAL_CFLAGS += -DENABLE_POWER_AIDL_V2_APIS
