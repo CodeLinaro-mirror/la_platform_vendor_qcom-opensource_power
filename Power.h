@@ -25,6 +25,11 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Changes from Qualcomm Innovation Center are provided under the following license:
+ *
+ * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
 
 #ifndef ANDROID_HARDWARE_POWER_POWER_H
@@ -48,6 +53,13 @@ class Power : public BnPower {
         ndk::ScopedAStatus isModeSupported(Mode type, bool* _aidl_return) override;
         ndk::ScopedAStatus setBoost(Boost type, int32_t durationMs) override;
         ndk::ScopedAStatus isBoostSupported(Boost type, bool* _aidl_return) override;
+#ifdef ENABLE_POWER_AIDL_V2_APIS
+        ndk::ScopedAStatus createHintSession(int32_t tgid, int32_t uid,
+                                             const std::vector<int32_t>& threadIds,
+                                             int64_t durationNanos,
+                                             std::shared_ptr<IPowerHintSession>* _aidl_return) override;
+        ndk::ScopedAStatus getHintSessionPreferredRate(int64_t* outNanoseconds) override;
+#endif // ENABLE_POWER_AIDL_V2_APIS
 };
 
 }  // namespace impl
