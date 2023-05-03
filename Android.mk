@@ -89,6 +89,10 @@ ifeq ($(call is-board-platform-in-list,msmnile), true)
 LOCAL_SRC_FILES += power-msmnile.c
 endif
 
+ifeq ($(call is-board-platform-in-list,gen4), true)
+LOCAL_SRC_FILES += power-msmnile.c
+endif
+
 ifeq ($(TARGET_USES_INTERACTION_BOOST),true)
     LOCAL_CFLAGS += -DINTERACTION_BOOST
 endif
