@@ -7,24 +7,22 @@ ifeq ($(call is-vendor-board-platform,QCOM),true)
 include $(CLEAR_VARS)
 
 LOCAL_MODULE_RELATIVE_PATH := hw
-
 LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils libbinder_ndk
 
-ifneq ( ,$(filter S 12,$(PLATFORM_VERSION)))
-    LOCAL_SHARED_LIBRARIES += android.hardware.power-V1-ndk_platform
-    LOCAL_VINTF_FRAGMENTS := power.xml
-else ifneq ( ,$(filter T 13 Tiramisu U 14 UpsideDownCake,$(PLATFORM_VERSION)))
-    LOCAL_SHARED_LIBRARIES += android.hardware.power-V2-ndk
-    LOCAL_VINTF_FRAGMENTS := power-v2.xml
-    LOCAL_CFLAGS += -DENABLE_POWER_AIDL_V2_APIS
-else
-    LOCAL_SHARED_LIBRARIES += android.hardware.power-ndk_platform
-    LOCAL_VINTF_FRAGMENTS := power.xml
+ifneq ( ,$(filter T 13 ,$(PLATFORM_VERSION)))
+     LOCAL_SHARED_LIBRARIES += android.hardware.power-V2-ndk
+     LOCAL_VINTF_FRAGMENTS := power-v2.xml
+     LOCAL_CFLAGS += -DENABLE_POWER_AIDL_V2_APIS
+else ifneq( ,$(filter U 14 ,$(PLATFORM_VERSION)))
+    LOCAL_SHARED_LIBRARIES += android.hardware.power-V4-ndk
+    LOCAL_VINTF_FRAGMENTS := power-v4.xml
+    LOCAL_SRC_FILES := PowerHintSession.cpp
 endif
+
 
 LOCAL_HEADER_LIBRARIES += libutils_headers
 LOCAL_HEADER_LIBRARIES += libhardware_headers
-LOCAL_SRC_FILES := power-common.c metadata-parser.c utils.c list.c hint-data.c powerhintparser.c Power.cpp main.cpp
+LOCAL_SRC_FILES += power-common.c metadata-parser.c utils.c list.c hint-data.c powerhintparser.c Power.cpp main.cpp
 LOCAL_C_INCLUDES := external/libxml2/include \
                     external/icu/icu4c/source/common
 
@@ -104,4 +102,3 @@ LOCAL_CFLAGS += -Wno-unused-parameter -Wno-unused-variable
 LOCAL_VENDOR_MODULE := true
 include $(BUILD_EXECUTABLE)
 endif
-

@@ -28,7 +28,7 @@
  *
  * Changes from Qualcomm Innovation Center are provided under the following license:
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
 
@@ -59,7 +59,13 @@ class Power : public BnPower {
                                              int64_t durationNanos,
                                              std::shared_ptr<IPowerHintSession>* _aidl_return) override;
         ndk::ScopedAStatus getHintSessionPreferredRate(int64_t* outNanoseconds) override;
-#endif // ENABLE_POWER_AIDL_V2_APIS
+#else
+        ndk::ScopedAStatus createHintSession(int32_t tgid, int32_t uid,
+                                             const std::vector<int32_t>& threadIds,
+                                             int64_t durationNanos,
+                                             std::shared_ptr<IPowerHintSession>* _aidl_return) override;
+        ndk::ScopedAStatus getHintSessionPreferredRate(int64_t* outNanoseconds) override;
+#endif
 };
 
 }  // namespace impl
