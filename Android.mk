@@ -6,7 +6,7 @@ ifeq ($(call is-vendor-board-platform,QCOM),true)
 include $(CLEAR_VARS)
 LOCAL_MODULE_RELATIVE_PATH := hw
 LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils libbinder_ndk
-ifeq ( ,$(filter UpsideDownCake Tiramisu T 13, $(PLATFORM_VERSION)))
+ifeq ( ,$(filter UpsideDownCake U 14 Tiramisu T 13, $(PLATFORM_VERSION)))
     LOCAL_SHARED_LIBRARIES += android.hardware.power-V1-ndk_platform
 else
     LOCAL_SHARED_LIBRARIES += android.hardware.power-V1-ndk
