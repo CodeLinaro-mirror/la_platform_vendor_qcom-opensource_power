@@ -9,7 +9,6 @@
 #include "performance.h"
 
 #define CPU_BOOST_HINT      0x0000104E
-#define THREAD_HIGH_UTIL    0x40C80000
 #define THREAD_LOW_LATENCY  0x40CD0000
 #define MAX_BOOST 200
 #define MIN_BOOST -200
@@ -119,9 +118,9 @@ PowerHintSessionImpl::~PowerHintSessionImpl(){
 
 int PowerHintSessionImpl::setThreadPipelining(int32_t tid) {
     int mHandleTid = -1;
-    int args[4] = {THREAD_HIGH_UTIL, tid, THREAD_LOW_LATENCY, tid};
+    int args[2] = {THREAD_LOW_LATENCY, tid};
 
-    mHandleTid = interaction_with_handle(0, 0, 4, args);
+    mHandleTid = interaction_with_handle(0, 0, 2, args);
     if(mHandleTid < 0) {
             LOG(ERROR) << "Unable to put this thread tid into pipeline" << tid;
             return -1;
