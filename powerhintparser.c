@@ -25,6 +25,9 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
+ * Changes from Qualcomm Innovation Center are provided under the following license:
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
 #include <cutils/log.h>
 #include <fcntl.h>
@@ -34,7 +37,9 @@
 #include <libxml/tree.h>
 #include <unistd.h>
 #include "powerhintparser.h"
+#ifndef LOG_TAG
 #define LOG_TAG "QTI PowerHAL"
+#endif
 
 int parsePowerhintXML() {
 
