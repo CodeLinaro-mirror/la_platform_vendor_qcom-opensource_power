@@ -25,6 +25,10 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Changes from Qualcomm Innovation Center are provided under the following license:
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
 #define LOG_NIDEBUG 0
 
@@ -56,6 +60,7 @@ static int (*perf_lock_acq)(int handle, int duration,
     int list[], int numArgs);
 static int (*perf_lock_rel)(int handle);
 static int (*perf_hint)(int, const char *, int, int);
+static PropVal (*perf_get_prop)(const char *prop , const char *def_val);
 static struct list_node active_hint_list_head;
 const char *pkg = "QTI PowerHAL";
 
@@ -101,6 +106,11 @@ static void __attribute__ ((constructor)) initialize(void)
 
         if (!perf_hint) {
             ALOGE("Unable to get perf_hint function handle.\n");
+        }
+
+        perf_get_prop = dlsym(qcopt_handle, "perf_get_prop");
+        if (!perf_get_prop) {
+            ALOGE("Unable to get perf_get_prop function handle.\n");
         }
     }
 }
@@ -210,6 +220,16 @@ int is_interactive_governor(char* governor) {
    return 0;
 }
 
+PropVal perf_get_property(const char *prop , const char *def_val) {
+    PropVal retVal;
+    if (qcopt_handle && perf_get_prop) {
+        retVal = perf_get_prop(prop, def_val);
+    } else {
+        strlcpy(retVal.value, def_val, PROPERTY_VALUE_MAX);
+    }
+    return retVal;
+}
+
 void interaction(int duration, int num_args, int opt_list[])
 {
 #ifdef INTERACTION_BOOST
@@ -230,7 +250,7 @@ void interaction(int duration, int num_args, int opt_list[])
 
 int interaction_with_handle(int lock_handle, int duration, int num_args, int opt_list[])
 {
-    if (duration < 0 || num_args < 1 || opt_list[0] == NULL)
+    if (duration < 0 || num_args < 1 || opt_list == NULL)
         return 0;
 
     if (qcopt_handle) {

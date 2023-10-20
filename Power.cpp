@@ -28,13 +28,16 @@
  *
  * Changes from Qualcomm Innovation Center are provided under the following license:
  *
- * Copyright (c) 2022 Qualcomm Innovation Center, Inc. All rights reserved.
+ * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
 
 #define LOG_TAG "QTI PowerHAL"
 
 #include "Power.h"
+#ifndef ENABLE_POWER_AIDL_V2_APIS
+#include "PowerHintSession.h"
+#endif
 
 #include <android-base/logging.h>
 
@@ -68,7 +71,6 @@ ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
         case Mode::DOUBLE_TAP_TO_WAKE:
         case Mode::LOW_POWER:
         case Mode::LAUNCH:
-        case Mode::EXPENSIVE_RENDERING:
         case Mode::DEVICE_IDLE:
         case Mode::DISPLAY_INACTIVE:
         case Mode::AUDIO_STREAMING_LOW_LATENCY:
@@ -78,6 +80,9 @@ ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
         case Mode::CAMERA_STREAMING_HIGH:
         case Mode::VR:
             LOG(INFO) << "Mode " << static_cast<int32_t>(type) << "Not Supported";
+            break;
+        case Mode::EXPENSIVE_RENDERING:
+            set_expensive_rendering(enabled);
             break;
         case Mode::INTERACTIVE:
             setInteractive(enabled);
@@ -98,6 +103,13 @@ ndk::ScopedAStatus Power::isModeSupported(Mode type, bool* _aidl_return) {
     LOG(INFO) << "Power isModeSupported: " << static_cast<int32_t>(type);
 
     switch(type){
+        case Mode::EXPENSIVE_RENDERING:
+            if (is_expensive_rendering_supported()) {
+                *_aidl_return = true;
+            } else {
+                *_aidl_return = false;
+            }
+            break;
         case Mode::INTERACTIVE:
         case Mode::SUSTAINED_PERFORMANCE:
         case Mode::FIXED_PERFORMANCE:
@@ -121,7 +133,6 @@ ndk::ScopedAStatus Power::isBoostSupported(Boost type, bool* _aidl_return) {
     *_aidl_return = false;
     return ndk::ScopedAStatus::ok();
 }
-
 #ifdef ENABLE_POWER_AIDL_V2_APIS
 ndk::ScopedAStatus Power::createHintSession(int32_t, int32_t, const std::vector<int32_t>&, int64_t,
                                             std::shared_ptr<IPowerHintSession>* _aidl_return) {
@@ -133,8 +144,25 @@ ndk::ScopedAStatus Power::getHintSessionPreferredRate(int64_t* outNanoseconds) {
     *outNanoseconds = -1;
     return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
 }
-#endif // ENABLE_POWER_AIDL_V2_APIS
+#else
+ndk::ScopedAStatus Power::createHintSession(int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
+                                            std::shared_ptr<IPowerHintSession>* _aidl_return) {
+    LOG(INFO) << "Power createHintSession";
+    if (threadIds.size() == 0) {
+        LOG(ERROR) << "Error: threadIds.size() shouldn't be " << threadIds.size();
+        *_aidl_return = nullptr;
+        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+    }
+    *_aidl_return = setPowerHintSession();
+    return ndk::ScopedAStatus::ok();
+}
 
+ndk::ScopedAStatus Power::getHintSessionPreferredRate(int64_t* outNanoseconds) {
+    LOG(INFO) << "Power getHintSessionPreferredRate";
+    *outNanoseconds = getSessionPreferredRate();
+    return ndk::ScopedAStatus::ok();
+}
+#endif
 }  // namespace impl
 }  // namespace power
 }  // namespace hardware
