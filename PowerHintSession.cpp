@@ -10,6 +10,7 @@
 
 #define CPU_BOOST_HINT      0x0000104E
 #define THREAD_LOW_LATENCY  0x40CD0000
+#define MAX_THREADS 32
 #define MAX_BOOST 200
 #define MIN_BOOST -200
 
@@ -33,6 +34,13 @@ void PowerHintSessionImpl::resetBoost() {
         release_request(mHandle);
     mHandle = -1;
     mLastAction = LOAD_RESET;
+}
+
+static std::string printThreads(std::vector<int32_t>& threadIds) {
+    std::string str;
+    for(int num : threadIds)
+        str = str + std::to_string(num) + " ";
+    return str;
 }
 
 bool PowerHintSessionImpl::perfBoost(int boostVal, int hintType) {
@@ -108,42 +116,47 @@ PowerHintSessionImpl::PowerHintSessionImpl(int32_t tgid, int32_t uid, const std:
      mHandle = -1;
      mLastAction = -1;
      setSessionActivity(this, true);
-     for(auto tid: threadIds)
-         mThreadHandles[tid] = setThreadPipelining(tid);
+     mThreadIds = threadIds;
+     mThreadHandle = setThreadPipelining(mThreadIds);
 }
 
 PowerHintSessionImpl::~PowerHintSessionImpl(){
      close();
 }
 
-int PowerHintSessionImpl::setThreadPipelining(int32_t tid) {
+int PowerHintSessionImpl::setThreadPipelining(std::vector<int32_t>& threadIds) {
     int mHandleTid = -1;
-    int args[2] = {THREAD_LOW_LATENCY, tid};
+    int size = threadIds.size() * 2;
+    int args[MAX_THREADS];
 
-    mHandleTid = interaction_with_handle(0, 0, 2, args);
+    if(size > MAX_THREADS)
+        return -1;
+
+    for(int i=0; i<size; i+=2) {
+        args[i] = THREAD_LOW_LATENCY;
+        args[i+1] = threadIds[i/2];
+    }
+
+    mHandleTid = interaction_with_handle(0, 0, size, args);
     if(mHandleTid < 0) {
-            LOG(ERROR) << "Unable to put this thread tid into pipeline" << tid;
+            LOG(ERROR) << "Unable to put these threads into pipeline";
             return -1;
     }
 
-    LOG(INFO) << "Thread with tid " << tid << " Handle " << mHandleTid;
+    LOG(INFO) << "Thread Low Latency Handle " << mHandleTid << " for threads " << printThreads(threadIds);
     return mHandleTid;
 }
 
 void PowerHintSessionImpl::removePipelining() {
-    for(auto& it: mThreadHandles) {
-        if(it.second > 0) {
-            release_request(it.second);
-	    LOG(INFO) << "Thread with tid " << it.first << " Handle " << it.second << " released";
-	}
-        it.second = -1;
+    if(mThreadHandle > 0) {
+        release_request(mThreadHandle);
+        LOG(INFO) << "Handle " << mThreadHandle << " released";
     }
+    mThreadHandle = -1;
 }
 
 void PowerHintSessionImpl::resumeThreadPipelining() {
-   for(auto& it: mThreadHandles) {
-       it.second = setThreadPipelining(it.first);
-   }
+    mThreadHandle = setThreadPipelining(mThreadIds);
 }
 
 ndk::ScopedAStatus PowerHintSessionImpl::updateTargetWorkDuration(int64_t in_targetDurationNanos){
@@ -178,7 +191,7 @@ ndk::ScopedAStatus PowerHintSessionImpl::close(){
     if(isSessionAlive(this)) {
         sendHint(aidl::android::hardware::power::SessionHint::CPU_LOAD_RESET);
         removePipelining();
-        mThreadHandles.clear();
+        mThreadIds.clear();
 
         mSessionLock.lock();
         mPowerHintSessions.erase(this);
@@ -217,18 +230,14 @@ ndk::ScopedAStatus PowerHintSessionImpl::setThreads(const std::vector<int32_t>& 
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
 
-    for(auto tid: threadIds) {
-        if(mThreadHandles.find(tid) == mThreadHandles.end())
-            mThreadHandles[tid] = setThreadPipelining(tid);
+    if(mThreadHandle > 0) {
+        release_request(mThreadHandle);
+        mThreadIds.clear();
+        mThreadHandle = -1;
     }
 
-    for(auto it: mThreadHandles) {
-        if(find(threadIds.begin(), threadIds.end(), it.first) == threadIds.end()) {
-            if(it.second > 0)
-                release_request(it.second);
-            mThreadHandles.erase(it.first);
-        }
-    }
+    mThreadIds = threadIds;
+    mThreadHandle = setThreadPipelining(mThreadIds);
 
     return ndk::ScopedAStatus::ok();
 }

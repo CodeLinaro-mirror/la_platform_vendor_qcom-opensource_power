@@ -36,7 +36,7 @@ public:
     ndk::ScopedAStatus sendHint(aidl::android::hardware::power::SessionHint hint) override;
     ndk::ScopedAStatus setThreads(const std::vector<int32_t>& threadIds) override;
     bool perfBoost(int boostVal, int hintType);
-    int setThreadPipelining(int32_t tid);
+    int setThreadPipelining(std::vector<int32_t>& threadIds);
     void removePipelining();
     void resumeThreadPipelining();
     void resetBoost();
@@ -46,6 +46,7 @@ private:
     int mHandle;
     int mBoostSum;
     int mLastAction;
-    std::unordered_map<int32_t, int> mThreadHandles;
+    int mThreadHandle;
+    std::vector<int32_t> mThreadIds;
 };
 #endif /* __POWERHINTSESSION__ */
