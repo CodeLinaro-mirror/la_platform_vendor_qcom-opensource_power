@@ -25,6 +25,9 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Changes from Qualcomm Innovation Center are provided under the following license:
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
 
 #define LOG_NIDEBUG 0
@@ -49,6 +52,7 @@
 #include "power-common.h"
 
 static struct hint_handles handles[NUM_HINTS];
+static int handleER = 0;
 
 void power_init()
 {
@@ -101,14 +105,33 @@ void power_hint(power_hint_t hint, void *data)
                     handles[hint].ref_count++;
             }
             else
-                if (handles[hint].handle > 0)
+                if (handles[hint].handle > 0) {
                     if (--handles[hint].ref_count == 0) {
                         release_request(handles[hint].handle);
                         handles[hint].handle = 0;
                     }
+                }
                 else
                     ALOGE("Lock for hint: %X was not acquired, cannot be released", hint);
         break;
+        default:
+        break;
+    }
+}
+
+bool is_expensive_rendering_supported() {
+    char property[PROPERTY_VALUE_MAX];
+    strlcpy(property, perf_get_property("vendor.perf.expensive_rendering", "0").value,
+            PROPERTY_VALUE_MAX);
+    return atoi(property) == 1 ? true : false;
+}
+
+void set_expensive_rendering(bool enabled)
+{
+    if (enabled) {
+        handleER = perf_hint_enable(PERF_HINT_EXPENSIVE_RENDERING, 0);
+    } else if (handleER > 0) {
+        release_request(handleER);
     }
 }
 

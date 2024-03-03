@@ -25,9 +25,17 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Changes from Qualcomm Innovation Center are provided under the following license:
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
 
 #include <cutils/properties.h>
+
+typedef struct {
+    char value[PROP_VALUE_MAX];
+} PropVal;
 
 int sysfs_read(char *path, char *s, int num_bytes);
 int sysfs_write(char *path, char *s);
@@ -45,3 +53,4 @@ void undo_hint_action(int hint_id);
 void release_request(int lock_handle);
 int interaction_with_handle(int lock_handle, int duration, int num_args, int opt_list[]);
 int perf_hint_enable(int hint_id, int duration);
+PropVal perf_get_property(const char *prop , const char *def_val);

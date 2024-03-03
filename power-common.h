@@ -25,7 +25,12 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Changes from Qualcomm Innovation Center are provided under the following license:
+ * Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
+
 #ifndef __POWER_COMMON_H__
 #define __POWER_COMMON_H__
 
@@ -49,6 +54,8 @@ extern "C" {
 #define HINT_HANDLED (0)
 #define HINT_NONE (-1)
 
+#define PERF_HINT_EXPENSIVE_RENDERING 0x000010A5
+
 #include <hardware/power.h>
 
 enum CPU_GOV_CHECK {
@@ -60,6 +67,8 @@ enum CPU_GOV_CHECK {
 
 void power_init(void);
 void power_hint(power_hint_t hint, void *data);
+bool is_expensive_rendering_supported();
+void set_expensive_rendering(bool enabled);
 void set_interactive(int on);
 
 #ifdef __cplusplus
