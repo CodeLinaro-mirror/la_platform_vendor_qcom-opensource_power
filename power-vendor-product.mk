@@ -25,4 +25,6 @@ else ifeq ($(TARGET_BOARD_PLATFORM),sun)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/sun/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 else ifeq ($(TARGET_BOARD_PLATFORM),blair)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/holi/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
+else ifeq ($(TARGET_BOARD_PLATFORM),pitti)
+PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/pitti/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 endif
