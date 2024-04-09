@@ -8,19 +8,11 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE_RELATIVE_PATH := hw
 
-LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils libbinder_ndk
-
-ifneq ( ,$(filter S 12,$(PLATFORM_VERSION)))
-    LOCAL_SHARED_LIBRARIES += android.hardware.power-V1-ndk_platform
-else ifneq ( ,$(filter T 13 Tiramisu,$(PLATFORM_VERSION)))
-    LOCAL_SHARED_LIBRARIES += android.hardware.power-V3-ndk
-else
-    LOCAL_SHARED_LIBRARIES += android.hardware.power-ndk_platform
-endif
+LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils libbinder_ndk android.hardware.power-V3-ndk
 
 LOCAL_HEADER_LIBRARIES += libutils_headers
 LOCAL_HEADER_LIBRARIES += libhardware_headers
-LOCAL_SRC_FILES := power-common.c metadata-parser.c utils.c list.c hint-data.c powerhintparser.c Power.cpp main.cpp
+LOCAL_SRC_FILES := power-common.c metadata-parser.c utils.c list.c hint-data.c powerhintparser.c Power.cpp main.cpp PowerHintSession.cpp
 LOCAL_C_INCLUDES := external/libxml2/include \
                     external/icu/icu4c/source/common
 
