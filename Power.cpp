@@ -43,6 +43,10 @@
 #include <android-base/logging.h>
 #include <android/binder_manager.h>
 #include <android/binder_process.h>
+#include <fcntl.h>
+extern "C" {
+#include "utils.h"
+}
 
 using ::aidl::android::hardware::power::BnPower;
 using ::aidl::android::hardware::power::IPower;
@@ -61,6 +65,31 @@ namespace impl {
 void setInteractive(bool interactive) {
    set_interactive(interactive ? 1:0);
 }
+
+int16_t read_soc_id() {
+    static int16_t soc_id = -1;
+    if(soc_id == -1) {
+
+        int8_t fd;
+        if (!access("/sys/devices/soc0/soc_id", F_OK)) {
+            fd = open("/sys/devices/soc0/soc_id", O_RDONLY);
+        } else if (!access("/sys/devices/system/soc0/soc_id", F_OK)) {
+            fd = open("/sys/devices/system/soc/soc0/id", O_RDONLY);
+        }
+        if (fd != -1)
+        {
+            char raw_buf[5];
+            read(fd, raw_buf,4);
+            raw_buf[4] = 0;
+            soc_id = atoi(raw_buf);
+            close(fd);
+        }
+    }
+    return soc_id;
+}
+
+/* Declare function before use */
+extern "C" void interaction(int duration, int num_args, int opt_list[]);
 
 ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
     LOG(INFO) << "Power setMode: " << static_cast<int32_t>(type) << " to: " << enabled;
@@ -111,14 +140,38 @@ ndk::ScopedAStatus Power::isModeSupported(Mode type, bool* _aidl_return) {
 }
 
 ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
+    int16_t soc_id;
+    soc_id =  read_soc_id();
     LOG(INFO) << "Power setBoost: " << static_cast<int32_t>(type)
                  << ", duration: " << durationMs;
+    if (type == Boost::DISPLAY_UPDATE_IMMINENT) {
+        if (soc_id == 486 || soc_id == 517) {
+            int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2, 0x42804000, 0x3};
+            int duration = 50;
+            interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
+        }
+    }
+    else if(type == Boost::INTERACTION) {
+        if (soc_id == 486 || soc_id == 517) {
+            int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2, 0x42804000, 0x0};
+            int duration = 500;
+            interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
+        }
+    }
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Power::isBoostSupported(Boost type, bool* _aidl_return) {
     LOG(INFO) << "Power isBoostSupported: " << static_cast<int32_t>(type);
-    *_aidl_return = false;
+    if ((type == Boost::DISPLAY_UPDATE_IMMINENT) || (type == Boost::INTERACTION)) {
+        int16_t soc_id;
+        soc_id =  read_soc_id();
+        if (soc_id == 486 || soc_id == 517) {
+            *_aidl_return = true;
+        }
+    } else {
+        *_aidl_return = false;
+    }
     return ndk::ScopedAStatus::ok();
 }
 ndk::ScopedAStatus Power::createHintSession(int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
