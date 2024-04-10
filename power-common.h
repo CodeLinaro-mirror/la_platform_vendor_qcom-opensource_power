@@ -55,6 +55,7 @@ enum CPU_GOV_CHECK {
     CPU2 = 2,
     CPU3 = 3
 };
+int16_t read_soc_id(void);
 void power_init(void);
 void power_hint(power_hint_t hint, void *data);
 void set_interactive(int on);
