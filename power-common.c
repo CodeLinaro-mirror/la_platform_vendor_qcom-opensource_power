@@ -97,7 +97,7 @@ void power_hint(power_hint_t hint, void *data)
         //fall through below, hints will fail if not defined in powerhint.xml
         case POWER_HINT_SUSTAINED_PERFORMANCE:
         case POWER_HINT_VIDEO_ENCODE:
-            if (data) {
+            if (data && (*(bool*)data == true)) {
                 if (handles[hint].ref_count == 0)
                     handles[hint].handle = perf_hint_enable((AOSP_DELTA + hint), 0);
 
