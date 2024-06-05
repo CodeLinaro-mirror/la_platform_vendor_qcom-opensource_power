@@ -49,7 +49,6 @@
 
         <!--camera ZSLPreview-->
         <!--CPU-LLC-DDR BWMON - Set sample_ms 33 -->
-        <!--CPU-LLC-DDR BWMON - Set io_percent 100 -->
         <!--CPU-LLC-DDR BWMON - Set hyst_length hist memory 0 -->
         <!--L CPU - Disable schedutil PL -->
         <!--L CPU - Set hispeed load 99 -->
@@ -59,14 +58,12 @@
         <!--GROUP DOWNMIGRATE - 30 -->
         <!--UPMIGRATE - 35 85-->
         <!--DOWNMIGRATE - 30 80-->
-        <!--AB_SCALE - 50-->
         <Config
             Id="0x00001330" Enable="true" Timeout="0" Target="volcano"
-            Resources="0x43034000, 0x21, 0x43020000, 0x64, 0x43024000, 0, 0x41444100, 0, 0x41440100, 0x63, 0x40804100, 0x386, 0x41008000, 0, 0x40CF4000, 0x0023001E, 0x40CE0000, 0x0023001E, 0x40CE0200, 0x00550050, 0x43048000, 0x32"/>
-
+            Resources="0x43034000, 0x21, 0x43024000, 0, 0x41444100, 0, 0x41440100, 0x63, 0x40804100, 0x386, 0x41008000, 0, 0x40CF4000, 0x0023001E, 0x40CE0000, 0x0023001E, 0x40CE0200, 0x00550050"/>
+      
         <!--camera 30fps-->
         <!--CPU-LLC-DDR BWMON - Set sample_ms 33 -->
-        <!--CPU-LLC-DDR BWMON - Set io_percent 100 -->
         <!--CPU-LLC-DDR BWMON - Set hyst_length hist memory 0 -->
         <!--CPU-LLC-DDR BWMON - Set min_freq 547 -->
         <!--L CPU max freq 9020000 -->
@@ -76,11 +73,10 @@
         <!--UPMIGRATE - 35 85 -->
         <!--DOWNMIGRATE - 30 85 -->
         <!--B CPU - Disable Core Control -->
-        <!--AB_SCALE - 50-->
         <Config
             Id="0x00001331" Enable="true" Timeout="0" Target="volcano"
-            Resources="0x43034000, 0x21, 0x43020000, 0x64, 0x43024000, 0, 0x4303C000, 0x858B8 ,0x40804100, 0x386, 0x41444100, 0, 0x41444000, 0, 0x41440000, 0x63,
-            0x40CE0000, 0x0023001E, 0x40CE0200, 0x00550055, 0x41008000, 0, 0x43048000, 0x32"/>
+            Resources="0x43034000, 0x21, 0x43024000, 0, 0x4303C000, 0x858B8 ,0x40804100, 0x386, 0x41444100, 0, 0x41444000, 0, 0x41440000, 0x63, 0x40CE0000, 0x0023001E,
+            0x40CE0200, 0x00550055, 0x41008000, 0"/>
 
         <!--camera 60fps-->
         <!--CPU-LLC-DDR BWMON - Set sample_ms 16 -->
