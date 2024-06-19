@@ -11,6 +11,7 @@
 #include <mutex>
 #include <aidl/android/hardware/power/WorkDuration.h>
 #include <aidl/android/hardware/power/SessionHint.h>
+#include <aidl/android/hardware/power/SessionMode.h>
 #include <aidl/android/hardware/power/BnPowerHintSession.h>
 
 enum LOAD_TYPE {
@@ -35,6 +36,8 @@ public:
     ndk::ScopedAStatus close() override;
     ndk::ScopedAStatus sendHint(aidl::android::hardware::power::SessionHint hint) override;
     ndk::ScopedAStatus setThreads(const std::vector<int32_t>& threadIds) override;
+    ndk::ScopedAStatus setMode(aidl::android::hardware::power::SessionMode mode, bool enabled) override;
+    ndk::ScopedAStatus getSessionConfig(aidl::android::hardware::power::SessionConfig* _aidl_return) override;
     bool perfBoost(int boostVal, int hintType);
     int setThreadPipelining(std::vector<int32_t>& threadIds);
     void removePipelining();
