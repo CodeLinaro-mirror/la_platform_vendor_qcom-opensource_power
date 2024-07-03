@@ -39,6 +39,7 @@ public:
     ndk::ScopedAStatus setMode(aidl::android::hardware::power::SessionMode mode, bool enabled) override;
     ndk::ScopedAStatus getSessionConfig(aidl::android::hardware::power::SessionConfig* _aidl_return) override;
     bool perfBoost(int boostVal, int hintType);
+    bool perfLockBoost(int boostVal, int hintType);
     int setThreadPipelining(std::vector<int32_t>& threadIds);
     void removePipelining();
     void resumeThreadPipelining();
@@ -51,5 +52,10 @@ private:
     int mLastAction;
     int mThreadHandle;
     std::vector<int32_t> mThreadIds;
+    int64_t mTargetWorkDurationNanos;
+    int64_t mPrevActualWorkDurationNanos;
+    int mHandlePerfLock;
+    int mBoostSumPerfLock;
+    int mLastActionPerfLock;
 };
 #endif /* __POWERHINTSESSION__ */

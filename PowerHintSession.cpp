@@ -13,6 +13,11 @@
 #define MAX_THREADS 32
 #define MAX_BOOST 200
 #define MIN_BOOST -200
+#define PERFLOCK_MAX_THREADS 5
+#define PERFLOCK_MAX_BOOST_PCT 50
+#define PERFLOCK_MIN_BOOST_PCT -20
+#define PERFLOCK_BOOST_INC_PCT 10
+#define PERFLOCK_BOOST_DEC_PCT -10
 
 #include <android-base/logging.h>
 #include "android/binder_auto_utils.h"
@@ -74,6 +79,48 @@ bool PowerHintSessionImpl::perfBoost(int boostVal, int hintType) {
     return true;
 }
 
+bool PowerHintSessionImpl::perfLockBoost(int boostVal, int hintType) {
+    int tBoostSumPerfLock = mBoostSumPerfLock;
+    int handle = -1;
+
+    if(hintType == LOAD_RESET) {
+        if(mHandlePerfLock > 0)
+            release_request(mHandlePerfLock);
+        mHandlePerfLock = -1;
+        mLastActionPerfLock = LOAD_RESET;
+        return true;
+    }
+
+    if(hintType == LOAD_RESUME && mLastActionPerfLock != LOAD_RESET) {
+        tBoostSumPerfLock = 0;
+    }
+
+    tBoostSumPerfLock += boostVal;
+    if(tBoostSumPerfLock > PERFLOCK_MAX_BOOST_PCT)
+        tBoostSumPerfLock = PERFLOCK_BOOST_DEC_PCT;
+    else if(tBoostSumPerfLock < PERFLOCK_MIN_BOOST_PCT)
+        tBoostSumPerfLock = PERFLOCK_MIN_BOOST_PCT;
+
+    if(tBoostSumPerfLock != 0) {
+        for(int32_t threadId : mThreadIds) {
+            int value = (tBoostSumPerfLock & 0x7F) | ((tBoostSumPerfLock < 0) ? 0x80 : 0x00) | (threadId << 8);
+            int list[2] = {0x43C04000, value};
+            handle = interaction_with_handle(handle, 0, 2, list);
+            if(handle < 0) {
+                LOG(ERROR) << "Unable to acquire Perf lock.";
+                return false;
+            }
+        }
+    }
+
+    if(mHandlePerfLock > 0)
+        release_request(mHandlePerfLock);
+    mHandlePerfLock = handle;
+    mBoostSumPerfLock = tBoostSumPerfLock;
+    mLastActionPerfLock = hintType;
+    return true;
+}
+
 bool isSessionAlive(PowerHintSessionImpl* session) {
     if(mPowerHintSessions.find(session) != mPowerHintSessions.end())
         return true;
@@ -119,6 +166,11 @@ PowerHintSessionImpl::PowerHintSessionImpl(int32_t tgid, int32_t uid, const std:
      setSessionActivity(this, true);
      mThreadIds = threadIds;
      mThreadHandle = setThreadPipelining(mThreadIds);
+     mTargetWorkDurationNanos = -1;
+     mPrevActualWorkDurationNanos = -1;
+     mBoostSumPerfLock = 0;
+     mHandlePerfLock = -1;
+     mLastActionPerfLock = -1;
 }
 
 PowerHintSessionImpl::~PowerHintSessionImpl(){
@@ -162,10 +214,34 @@ void PowerHintSessionImpl::resumeThreadPipelining() {
 
 ndk::ScopedAStatus PowerHintSessionImpl::updateTargetWorkDuration(int64_t in_targetDurationNanos){
     LOG(INFO) << "updateTargetWorkDuration " << in_targetDurationNanos;
+    if(in_targetDurationNanos <= 0) {
+        LOG(ERROR) << "Invalid target work duration";
+        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+    }
+    mTargetWorkDurationNanos = in_targetDurationNanos;
     return ndk::ScopedAStatus::ok();
 }
 ndk::ScopedAStatus PowerHintSessionImpl::reportActualWorkDuration(const std::vector<::aidl::android::hardware::power::WorkDuration>& in_durations){
     LOG(INFO) << "reportActualWorkDuration ";
+    int64_t prevActualDurations = mPrevActualWorkDurationNanos;
+    int64_t actualDurations = in_durations.back().durationNanos;
+    int64_t targetDurations = mTargetWorkDurationNanos;
+    int boostSum = mBoostSumPerfLock;
+    int lastAction = mLastActionPerfLock;
+
+    if(actualDurations >= targetDurations) {
+        if((lastAction == LOAD_UP || lastAction == LOAD_RESUME) && actualDurations < prevActualDurations)
+            perfLockBoost(boostSum, LOAD_RESUME);
+        else
+            perfLockBoost(PERFLOCK_BOOST_INC_PCT, LOAD_UP);
+    }
+    else {
+        if((lastAction == LOAD_DOWN || lastAction == LOAD_RESUME) && actualDurations > prevActualDurations)
+            perfLockBoost(boostSum, LOAD_RESUME);
+        else
+            perfLockBoost(PERFLOCK_BOOST_DEC_PCT, LOAD_DOWN);
+    }
+    mPrevActualWorkDurationNanos = actualDurations;
     return ndk::ScopedAStatus::ok();
 }
 ndk::ScopedAStatus PowerHintSessionImpl::pause(){
