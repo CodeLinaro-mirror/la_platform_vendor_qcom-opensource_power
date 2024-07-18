@@ -82,7 +82,7 @@
         <!--CPU-LLC-DDR BWMON - Set sample_ms 16 -->
         <!--CPU-LLC-DDR BWMON - Set io_percent 100 -->
         <!--CPU-LLC-DDR BWMON - Set hyst_length hist memory 0 -->
-        <!--CPU-LLC-DDR BWMON - Set min_freq 1555 -->
+        <!--CPU-LLC-DDR BWMON - Set min_freq 1353 -->
         <!--L CPU max freq 1113600 -->
         <!--L CPU - Disable schedutil PL -->
         <!--B CPU - Disable schedutil PL -->
@@ -93,14 +93,14 @@
         <!--AB_SCALE - 50-->
         <Config
             Id="0x00001332" Enable="true" Timeout="0" Target="volcano"
-            Resources="0x43034000, 0x10, 0x43020000, 0x64, 0x43024000, 0, 0x4303C000, 0x17BA38,  0x40804100, 0x459, 0x41444100, 0, 0x41444000, 0, 0x41440000, 0x63,
+            Resources="0x43034000, 0x10, 0x43020000, 0x64, 0x43024000, 0, 0x4303C000, 0x14A780, 0x40804100, 0x459, 0x41444100, 0, 0x41444000, 0, 0x41440000, 0x63,
             0x40CE0000, 0x0023001E, 0x40CE0200, 0x00550055, 0x41008000, 0, 0x43048000, 0x32"/>
 
         <!-- camera HFR -->
         <!--CPU-LLC-DDR BWMON - Set sample_ms 16 -->
         <!--CPU-LLC-DDR BWMON - Set io_percent 100 -->
         <!--CPU-LLC-DDR BWMON - Set hyst_length hist memory 0 -->
-        <!--CPU-LLC-DDR BWMON - Set min_freq 1555 -->
+        <!--CPU-LLC-DDR BWMON - Set min_freq 1353 -->
         <!--L CPU max freq 1113600 -->
         <!--L CPU - Disable schedutil PL -->
         <!--B CPU - Disable schedutil PL -->
@@ -110,7 +110,7 @@
         <!--B CPU - Disable Core Control -->
         <Config
             Id="0x00001333" Enable="true" Timeout="0" Target="volcano"
-            Resources="0x43034000, 0x10, 0x43020000, 0x64, 0x43024000, 0, 0x4303C000, 0x17BA38,  0x40804100, 0x459, 0x41444100, 0, 0x41444000, 0, 0x41440000, 0x63,
+            Resources="0x43034000, 0x10, 0x43020000, 0x64, 0x43024000, 0, 0x4303C000, 0x14A780, 0x40804100, 0x459, 0x41444100, 0, 0x41444000, 0, 0x41440000, 0x63,
             0x40CE0000, 0x0023001E, 0x40CE0200, 0x00550055, 0x41008000, 0"/>
 
         <!--video encode HFR 480 fps-->
