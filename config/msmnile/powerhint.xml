@@ -31,6 +31,19 @@
 -->
 <HintConfigs>
     <Powerhint>
+        <!--sustained performance-->
+        <!-- B CPU - Cluster min freq ~1.05GHz -->
+        <!-- L CPU - Cluster min freq ~1.03GHz -->
+        <!-- B CPU - Cluster max freq ~1.80GHz -->
+        <!-- GPU - min pwrlevel 7 (257Mhz) -->
+        <!-- GPU - max pwrlevel 2 (585Mhz)-->
+        <!-- Prime CPU offline -->
+        <Config
+            Id="0x00001206" Enable="true" Target="msmnile_au" Timeout="0"
+            Resources="0x40800200, 0x420, 0x40800100, 0x40C, 0x40804200, 0x70C,
+            0X42804000, 0x7, 0X42808000, 0x2, 0x41008000, 0x0"/>
+
+
         <!--video encode 30 fps-->
         <Config
             Id="0x00001203" Enable="true" Target="msmnile" Timeout="0"
