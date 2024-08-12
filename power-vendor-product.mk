@@ -31,4 +31,6 @@ else ifeq ($(TARGET_BOARD_PLATFORM),volcano)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/volcano/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 else ifeq ($(TARGET_BOARD_PLATFORM),niobe)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/niobe/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
+else ifeq ($(TARGET_BOARD_PLATFORM),parrot)
+PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/parrot/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 endif
