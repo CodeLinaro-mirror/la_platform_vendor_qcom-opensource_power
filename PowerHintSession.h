@@ -51,6 +51,7 @@ private:
     int mHandle;
     int mBoostSum;
     int mLastAction;
+    int mHandleFreq;
     int mThreadHandle;
     std::vector<int32_t> mThreadIds;
     int64_t mTargetWorkDurationNanos;
