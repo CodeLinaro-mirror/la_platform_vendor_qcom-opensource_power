@@ -31,6 +31,13 @@
  * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
 
+#ifndef __UTILS_H__
+#define __UTILS_H__
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <cutils/properties.h>
 
 typedef struct {
@@ -54,3 +61,9 @@ void release_request(int lock_handle);
 int interaction_with_handle(int lock_handle, int duration, int num_args, int opt_list[]);
 int perf_hint_enable(int hint_id, int duration);
 PropVal perf_get_property(const char *prop , const char *def_val);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif //__UTILS_H__

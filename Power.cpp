@@ -27,7 +27,6 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Changes from Qualcomm Innovation Center are provided under the following license:
- *
  * Copyright (c) 2022-2023 Qualcomm Innovation Center, Inc. All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
@@ -35,9 +34,7 @@
 #define LOG_TAG "QTI PowerHAL"
 
 #include "Power.h"
-#ifndef ENABLE_POWER_AIDL_V2_APIS
 #include "PowerHintSession.h"
-#endif
 
 #include <android-base/logging.h>
 
@@ -133,18 +130,7 @@ ndk::ScopedAStatus Power::isBoostSupported(Boost type, bool* _aidl_return) {
     *_aidl_return = false;
     return ndk::ScopedAStatus::ok();
 }
-#ifdef ENABLE_POWER_AIDL_V2_APIS
-ndk::ScopedAStatus Power::createHintSession(int32_t, int32_t, const std::vector<int32_t>&, int64_t,
-                                            std::shared_ptr<IPowerHintSession>* _aidl_return) {
-    *_aidl_return = nullptr;
-    return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
-}
 
-ndk::ScopedAStatus Power::getHintSessionPreferredRate(int64_t* outNanoseconds) {
-    *outNanoseconds = -1;
-    return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
-}
-#else
 ndk::ScopedAStatus Power::createHintSession(int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
                                             std::shared_ptr<IPowerHintSession>* _aidl_return) {
     LOG(INFO) << "Power createHintSession";
@@ -153,7 +139,7 @@ ndk::ScopedAStatus Power::createHintSession(int32_t tgid, int32_t uid, const std
         *_aidl_return = nullptr;
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
-    *_aidl_return = setPowerHintSession();
+    *_aidl_return = setPowerHintSession(tgid, uid, threadIds);
     return ndk::ScopedAStatus::ok();
 }
 
@@ -162,7 +148,7 @@ ndk::ScopedAStatus Power::getHintSessionPreferredRate(int64_t* outNanoseconds) {
     *outNanoseconds = getSessionPreferredRate();
     return ndk::ScopedAStatus::ok();
 }
-#endif
+
 }  // namespace impl
 }  // namespace power
 }  // namespace hardware
