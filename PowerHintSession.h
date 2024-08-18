@@ -38,6 +38,7 @@ public:
     ndk::ScopedAStatus setThreads(const std::vector<int32_t>& threadIds) override;
     ndk::ScopedAStatus setMode(aidl::android::hardware::power::SessionMode mode, bool enabled) override;
     ndk::ScopedAStatus getSessionConfig(aidl::android::hardware::power::SessionConfig* _aidl_return) override;
+    ndk::ScopedAStatus sendHintPerfLock(aidl::android::hardware::power::SessionHint hint);
     bool perfBoost(int boostVal, int hintType);
     bool perfLockBoost(int boostVal, int hintType);
     int setThreadPipelining(std::vector<int32_t>& threadIds);
