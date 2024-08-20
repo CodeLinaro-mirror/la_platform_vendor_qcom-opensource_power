@@ -10,12 +10,13 @@
 
 #define CPU_BOOST_HINT      0x0000104E
 #define THREAD_LOW_LATENCY  0x40CD0000
+#define MPCTLV3_SCHED_TASK_LOAD_BOOST  0x43C04000
 #define MAX_THREADS 32
 #define MAX_BOOST 200
 #define MIN_BOOST -200
 #define PERFLOCK_MAX_THREADS 5
-#define PERFLOCK_MAX_BOOST_PCT 50
-#define PERFLOCK_MIN_BOOST_PCT -20
+#define PERFLOCK_MAX_BOOST_PCT 80
+#define PERFLOCK_MIN_BOOST_PCT -80
 #define PERFLOCK_BOOST_INC_PCT 10
 #define PERFLOCK_BOOST_DEC_PCT -10
 
@@ -83,40 +84,58 @@ bool PowerHintSessionImpl::perfLockBoost(int boostVal, int hintType) {
     int tBoostSumPerfLock = mBoostSumPerfLock;
     int handle = -1;
 
-    if(hintType == LOAD_RESET) {
-        if(mHandlePerfLock > 0)
-            release_request(mHandlePerfLock);
-        mHandlePerfLock = -1;
-        mLastActionPerfLock = LOAD_RESET;
-        return true;
-    }
-
-    if(hintType == LOAD_RESUME && mLastActionPerfLock != LOAD_RESET) {
+    // calculate boostSum
+    if(hintType == LOAD_RESET || hintType == LOAD_RESUME) {
         tBoostSumPerfLock = 0;
     }
 
     tBoostSumPerfLock += boostVal;
-    if(tBoostSumPerfLock > PERFLOCK_MAX_BOOST_PCT)
-        tBoostSumPerfLock = PERFLOCK_BOOST_DEC_PCT;
-    else if(tBoostSumPerfLock < PERFLOCK_MIN_BOOST_PCT)
-        tBoostSumPerfLock = PERFLOCK_MIN_BOOST_PCT;
-
-    if(tBoostSumPerfLock != 0) {
-        for(int32_t threadId : mThreadIds) {
-            int value = (tBoostSumPerfLock & 0x7F) | ((tBoostSumPerfLock < 0) ? 0x80 : 0x00) | (threadId << 8);
-            int list[2] = {0x43C04000, value};
-            handle = interaction_with_handle(handle, 0, 2, list);
-            if(handle < 0) {
+    if(tBoostSumPerfLock > PERFLOCK_MAX_BOOST_PCT) {
+        tBoostSumPerfLock = PERFLOCK_MAX_BOOST_PCT;
+        if(mHandleFreq < 0) {
+            // Change the min freq to 800MHz
+            int listFreq[2];
+            listFreq[0] = 0x40800000;
+            listFreq[1] = 800;
+            mHandleFreq = interaction_with_handle(mHandleFreq, 3000, 2, listFreq);
+            if(mHandleFreq < 0) {
                 LOG(ERROR) << "Unable to acquire Perf lock.";
-                return false;
             }
         }
     }
+    else {
+        if(mHandleFreq > 0) {
+            release_request(mHandleFreq);
+            mHandleFreq = -1;
+        }
+    }
+    if(tBoostSumPerfLock < PERFLOCK_MIN_BOOST_PCT)
+        tBoostSumPerfLock = PERFLOCK_MIN_BOOST_PCT;
 
+    // release old boost
     if(mHandlePerfLock > 0)
         release_request(mHandlePerfLock);
+
+    if(tBoostSumPerfLock != 0) {
+        int numThreads = (mThreadIds.size() > PERFLOCK_MAX_THREADS) ? PERFLOCK_MAX_THREADS : mThreadIds.size();
+        int size = numThreads * 2;
+        int list[size];
+        for(int i = 0; i < size; i+=2) {
+            list[i] = MPCTLV3_SCHED_TASK_LOAD_BOOST;
+            list[i + 1] = (std::abs(tBoostSumPerfLock) & 0x7F) | ((tBoostSumPerfLock < 0) ? 0x80 : 0x00) | (mThreadIds[i/2] << 8);
+        }
+
+        // acquire new boost
+        handle = interaction_with_handle(handle, 0, size, list);
+        if(handle < 0) {
+            LOG(ERROR) << "Unable to acquire Perf lock.";
+            return false;
+        }
+    }
+
     mHandlePerfLock = handle;
-    mBoostSumPerfLock = tBoostSumPerfLock;
+    if(hintType != LOAD_RESET)
+        mBoostSumPerfLock = tBoostSumPerfLock;
     mLastActionPerfLock = hintType;
     return true;
 }
@@ -171,6 +190,7 @@ PowerHintSessionImpl::PowerHintSessionImpl(int32_t tgid, int32_t uid, const std:
      mBoostSumPerfLock = 0;
      mHandlePerfLock = -1;
      mLastActionPerfLock = -1;
+     mHandleFreq = -1;
 }
 
 PowerHintSessionImpl::~PowerHintSessionImpl(){
@@ -222,12 +242,12 @@ ndk::ScopedAStatus PowerHintSessionImpl::updateTargetWorkDuration(int64_t in_tar
     return ndk::ScopedAStatus::ok();
 }
 ndk::ScopedAStatus PowerHintSessionImpl::reportActualWorkDuration(const std::vector<::aidl::android::hardware::power::WorkDuration>& in_durations){
-    LOG(INFO) << "reportActualWorkDuration ";
     int64_t prevActualDurations = mPrevActualWorkDurationNanos;
     int64_t actualDurations = in_durations.back().durationNanos;
     int64_t targetDurations = mTargetWorkDurationNanos;
     int boostSum = mBoostSumPerfLock;
     int lastAction = mLastActionPerfLock;
+    LOG(INFO) << "reportActualWorkDuration " << actualDurations;
 
     if(actualDurations >= targetDurations) {
         if((lastAction == LOAD_UP || lastAction == LOAD_RESUME) && actualDurations < prevActualDurations)
@@ -249,6 +269,11 @@ ndk::ScopedAStatus PowerHintSessionImpl::pause(){
     if(isSessionAlive(this)) {
         setSessionActivity(this, false);
         sendHint(aidl::android::hardware::power::SessionHint::CPU_LOAD_RESET);
+        sendHintPerfLock(aidl::android::hardware::power::SessionHint::CPU_LOAD_RESET);
+        if(mHandleFreq > 0) {
+            release_request(mHandleFreq);
+            mHandleFreq = -1;
+        }
         removePipelining();
     }
     return ndk::ScopedAStatus::ok();
@@ -257,6 +282,7 @@ ndk::ScopedAStatus PowerHintSessionImpl::resume(){
     LOG(INFO) << "PowerHintSessionImpl::resume ";
     if(isSessionAlive(this)) {
         sendHint(aidl::android::hardware::power::SessionHint::CPU_LOAD_RESUME);
+        sendHintPerfLock(aidl::android::hardware::power::SessionHint::CPU_LOAD_RESUME);
         resumeThreadPipelining();
         setSessionActivity(this, true);
     }
@@ -267,6 +293,11 @@ ndk::ScopedAStatus PowerHintSessionImpl::close(){
 
     if(isSessionAlive(this)) {
         sendHint(aidl::android::hardware::power::SessionHint::CPU_LOAD_RESET);
+        sendHintPerfLock(aidl::android::hardware::power::SessionHint::CPU_LOAD_RESET);
+        if(mHandleFreq > 0) {
+            release_request(mHandleFreq);
+            mHandleFreq = -1;
+        }
         removePipelining();
         mThreadIds.clear();
 
@@ -274,6 +305,14 @@ ndk::ScopedAStatus PowerHintSessionImpl::close(){
         mPowerHintSessions.erase(this);
         mSessionLock.unlock();
     }
+    return ndk::ScopedAStatus::ok();
+}
+ndk::ScopedAStatus PowerHintSessionImpl::sendHintPerfLock(aidl::android::hardware::power::SessionHint hint){
+    LOG(INFO) << "PowerHintSessionImpl::sendHintPerfLock ";
+    if(hint == aidl::android::hardware::power::SessionHint::CPU_LOAD_RESET)
+        perfLockBoost(0, LOAD_RESET);
+    else if(hint == aidl::android::hardware::power::SessionHint::CPU_LOAD_RESUME)
+        perfLockBoost(0, LOAD_RESUME);
     return ndk::ScopedAStatus::ok();
 }
 ndk::ScopedAStatus PowerHintSessionImpl::sendHint(aidl::android::hardware::power::SessionHint hint){
