@@ -32,6 +32,7 @@
 #include <cutils/log.h>
 #include <fcntl.h>
 #include <string.h>
+#include <stdlib.h>
 #include <cutils/properties.h>
 #include <libxml/parser.h>
 #include <libxml/tree.h>
