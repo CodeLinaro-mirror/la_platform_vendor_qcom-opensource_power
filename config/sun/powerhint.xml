@@ -196,9 +196,6 @@
         <!--CPU-MEDIUM-LLC BWMON - Set sample_ms 33 -->
         <!--CPU-MEDIUM-LLC BWMON - Set io_percent 120 -->
         <!--CPU-MEDIUM-LLC BWMON - Set hyst_length hist memory 0 -->
-        <!--CPU-LLC-DDR BWMON - Set sample_ms 33 -->
-        <!--CPU-LLC-DDR BWMON - Set io_percent 100 -->
-        <!--CPU-LLC-DDR BWMON - Set hyst_length hist memory 0 -->
         <!--B CPU - Disable schedutil PL -->
         <!--B CPU - Set hispeed load 99 -->
         <!-- MPCTLV3_SCHED_IDLE_ENOUGH  0 -->
@@ -216,9 +213,6 @@
         <!--CPU-MEDIUM-LLC BWMON - Set sample_ms 33 -->
         <!--CPU-MEDIUM-LLC BWMON - Set io_percent 120 -->
         <!--CPU-MEDIUM-LLC BWMON - Set hyst_length hist memory 0 -->
-        <!--CPU-LLC-DDR BWMON - Set sample_ms 33 -->
-        <!--CPU-LLC-DDR BWMON - Set io_percent 100 -->
-        <!--CPU-LLC-DDR BWMON - Set hyst_length hist memory 0 -->
         <!--B CPU - Disable schedutil PL -->
         <!--B CPU - Set hispeed load 99 -->
         <!-- MPCTLV3_SCHED_IDLE_ENOUGH  0 -->
@@ -238,9 +232,6 @@
         <!--CPU-MEDIUM-LLC BWMON - Set sample_ms 16 -->
         <!--CPU-MEDIUM-LLC BWMON - Set io_percent 120 -->
         <!--CPU-MEDIUM-LLC BWMON - Set hyst_length hist memory 0 -->
-        <!--CPU-LLC-DDR BWMON - Set sample_ms 16 -->
-        <!--CPU-LLC-DDR BWMON - Set io_percent 100 -->
-        <!--CPU-LLC-DDR BWMON - Set hyst_length hist memory 0 -->
         <!--CPU-LLC-DDR BWMON - Set min_freq 1555 -->
         <!--B CPU - Disable schedutil PL -->
         <!--B CPU - Set hispeed load 99 -->
@@ -251,6 +242,25 @@
             Id="0x00001332" Enable="true" Timeout="0" Target="sun"
             Resources="0x4183C000, 0x10, 0x41834000, 0xB4, 0x41838000, 0, 0x4185C000, 0x10, 0x41854000, 0xB4, 0x41858000, 0,
             0x4303C000, 0x14A528, 0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x4143C000, 0x22C"/>
+
+        <!--camera 60fps DMM -->
+        <!--CPU-LARGE-LLC BWMON - Set sample_ms 16 -->
+        <!--CPU-LARGE-LLC BWMON - Set io_percent 120 -->
+        <!--CPU-LARGE-LLC BWMON - Set hyst_length hist memory 0 -->
+        <!--CPU-MEDIUM-LLC BWMON - Set sample_ms 16 -->
+        <!--CPU-MEDIUM-LLC BWMON - Set io_percent 120 -->
+        <!--CPU-MEDIUM-LLC BWMON - Set hyst_length hist memory 0 -->
+        <!--CPU-LLC-DDR BWMON - Set min_freq 1555 -->
+        <!--B CPU - Disable schedutil PL -->
+        <!--B CPU - Set hispeed load 99 -->
+        <!-- MPCTLV3_SCHED_IDLE_ENOUGH  0 -->
+        <!-- MPCTLV3_CORE_CTL_OFFLINE_DELAY_MS_BIG 0 -->
+        <!-- Medium cluster min freq to 960MHz -->
+        <Config
+            Id="0x00001340" Enable="true" Timeout="0" Target="sun"
+            Resources="0x4183C000, 0x10, 0x41834000, 0xB4, 0x41838000, 0, 0x4185C000, 0x10, 0x41854000, 0xB4, 0x41858000, 0,
+            0x4303C000, 0x14A528, 0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x40800000, 0x480,
+            0x41000000, 6, 0x4100C000, 0x0"/>
 
         <!--camera HFR 120/240 fps-->
         <!--CPU-LARGE-LLC BWMON - Set sample_ms 16 -->
@@ -277,9 +287,6 @@
         <!--CPU-MEDIUM-LLC BWMON - Set sample_ms 33 -->
         <!--CPU-MEDIUM-LLC BWMON - Set io_percent 120 -->
         <!--CPU-MEDIUM-LLC BWMON - Set hyst_length hist memory 0 -->
-        <!--CPU-LLC-DDR BWMON - Set sample_ms 33 -->
-        <!--CPU-LLC-DDR BWMON - Set io_percent 100 -->
-        <!--CPU-LLC-DDR BWMON - Set hyst_length hist memory 0 -->
         <!--B CPU - Disable schedutil PL -->
         <!--B CPU - Set hispeed load 99 -->
         <!-- MPCTLV3_SCHED_IDLE_ENOUGH  0 -->
