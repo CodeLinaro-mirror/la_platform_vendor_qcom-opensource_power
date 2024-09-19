@@ -140,10 +140,14 @@ ndk::ScopedAStatus Power::isModeSupported(Mode type, bool* _aidl_return) {
 }
 
 ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
+#ifdef ENABLE_POWER_HINT_FOR_WEAR
     int16_t soc_id;
     soc_id =  read_soc_id();
+#endif
     LOG(INFO) << "Power setBoost: " << static_cast<int32_t>(type)
                  << ", duration: " << durationMs;
+
+#ifdef ENABLE_POWER_HINT_FOR_WEAR
     if (type == Boost::DISPLAY_UPDATE_IMMINENT) {
         if (soc_id == 486 || soc_id == 517) {
             int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2, 0x42804000, 0x3};
@@ -158,11 +162,13 @@ ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
             interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
         }
     }
+#endif
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Power::isBoostSupported(Boost type, bool* _aidl_return) {
     LOG(INFO) << "Power isBoostSupported: " << static_cast<int32_t>(type);
+#ifdef ENABLE_POWER_HINT_FOR_WEAR
     if ((type == Boost::DISPLAY_UPDATE_IMMINENT) || (type == Boost::INTERACTION)) {
         int16_t soc_id;
         soc_id =  read_soc_id();
@@ -172,6 +178,9 @@ ndk::ScopedAStatus Power::isBoostSupported(Boost type, bool* _aidl_return) {
     } else {
         *_aidl_return = false;
     }
+#else
+    *_aidl_return = false;
+#endif
     return ndk::ScopedAStatus::ok();
 }
 ndk::ScopedAStatus Power::createHintSession(int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
