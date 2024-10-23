@@ -191,46 +191,47 @@
 
         <!--camera ZSLPreview-->
         <!--CPU-LARGE-LLC BWMON - Set sample_ms 33 -->
-        <!--CPU-LARGE-LLC BWMON - Set io_percent 120 -->
+        <!--CPU-LARGE-LLC BWMON - Set io_percent 180 -->
         <!--CPU-LARGE-LLC BWMON - Set hyst_length hist memory 0 -->
         <!--CPU-MEDIUM-LLC BWMON - Set sample_ms 33 -->
-        <!--CPU-MEDIUM-LLC BWMON - Set io_percent 120 -->
+        <!--CPU-MEDIUM-LLC BWMON - Set io_percent 180 -->
         <!--CPU-MEDIUM-LLC BWMON - Set hyst_length hist memory 0 -->
         <!--B CPU - Disable schedutil PL -->
         <!--B CPU - Set hispeed load 99 -->
         <!-- MPCTLV3_SCHED_IDLE_ENOUGH  0 -->
-        <!-- MPCTLV3_CORE_CTL_OFFLINE_DELAY_MS_BIG 20 -->
-        <!-- MPCTLV3_SCHEDUTIL_HISPEED_FREQ_CLUSTER_BIG  556MHz -->
+        <!-- MPCTLV3_CORE_CTL_OFFLINE_DELAY_MS_BIG 0 -->
+        <!-- MPCTL_ONLINE_CPU_CLUSTER_BIG  3 -->
+        <!-- MPCTLV3_CORE_CTL_CPU_NOT_PREFERRED_BIG  000111 -->
         <Config
             Id="0x00001330" Enable="true" Timeout="0" Target="sun"
             Resources="0x4183C000, 0x21, 0x41834000, 0xB4, 0x41838000, 0,  0x4185C000, 0x21, 0x41854000, 0xB4, 0x41858000, 0,
-            0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 20, 0x4143C000, 0x22C"/>
+            0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x41000000, 3, 0x4100C000, 0x7"/>
 
         <!--camera 30fps-->
         <!--CPU-LARGE-LLC BWMON - Set sample_ms 33 -->
-        <!--CPU-LARGE-LLC BWMON - Set io_percent 120 -->
+        <!--CPU-LARGE-LLC BWMON - Set io_percent 180 -->
         <!--CPU-LARGE-LLC BWMON - Set hyst_length hist memory 0 -->
         <!--CPU-MEDIUM-LLC BWMON - Set sample_ms 33 -->
-        <!--CPU-MEDIUM-LLC BWMON - Set io_percent 120 -->
+        <!--CPU-MEDIUM-LLC BWMON - Set io_percent 180 -->
         <!--CPU-MEDIUM-LLC BWMON - Set hyst_length hist memory 0 -->
         <!--B CPU - Disable schedutil PL -->
         <!--B CPU - Set hispeed load 99 -->
         <!-- MPCTLV3_SCHED_IDLE_ENOUGH  0 -->
-        <!-- MPCTLV3_CORE_CTL_OFFLINE_DELAY_MS_BIG 20 -->
+        <!-- MPCTLV3_CORE_CTL_OFFLINE_DELAY_MS_BIG 0 -->
         <!-- MPCTLV3_SCHEDUTIL_HISPEED_FREQ_CLUSTER_BIG  556MHz -->
         <!-- MPCTLV3_MIN_ONLINE_CPU_CLUSTER_BIG  3 -->
         <!-- MPCTLV3_CORE_CTL_CPU_NOT_PREFERRED_BIG  000111 -->
         <Config
             Id="0x00001331" Enable="true" Timeout="0" Target="sun"
             Resources="0x4183C000, 0x21, 0x41834000, 0xB4, 0x41838000, 0, 0x4185C000, 0x21, 0x41854000, 0xB4, 0x41858000, 0,
-            0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 20, 0x4143C000, 0x22C, 0x41000000, 3, 0x4100C000, 0x7"/>
+            0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x4143C000, 0x22C, 0x41000000, 3, 0x4100C000, 0x7"/>
 
         <!--camera 60fps-->
         <!--CPU-LARGE-LLC BWMON - Set sample_ms 16 -->
-        <!--CPU-LARGE-LLC BWMON - Set io_percent 120 -->
+        <!--CPU-LARGE-LLC BWMON - Set io_percent 200 -->
         <!--CPU-LARGE-LLC BWMON - Set hyst_length hist memory 0 -->
         <!--CPU-MEDIUM-LLC BWMON - Set sample_ms 16 -->
-        <!--CPU-MEDIUM-LLC BWMON - Set io_percent 120 -->
+        <!--CPU-MEDIUM-LLC BWMON - Set io_percent 200 -->
         <!--CPU-MEDIUM-LLC BWMON - Set hyst_length hist memory 0 -->
         <!--CPU-LLC-DDR BWMON - Set min_freq 1555 -->
         <!--B CPU - Disable schedutil PL -->
@@ -238,24 +239,29 @@
         <!-- MPCTLV3_SCHED_IDLE_ENOUGH  0 -->
         <!-- MPCTLV3_CORE_CTL_OFFLINE_DELAY_MS_BIG 0 -->
         <!-- MPCTLV3_SCHEDUTIL_HISPEED_FREQ_CLUSTER_BIG  556MHz -->
+        <!-- MPCTLV3_GOLD_CPU_LLCC_BW_AB_SCALE  70 -->
+        <!-- MPCTLV3_CPU_LLCC_BW_AB_SCALE  70 -->
         <Config
             Id="0x00001332" Enable="true" Timeout="0" Target="sun"
-            Resources="0x4183C000, 0x10, 0x41834000, 0xB4, 0x41838000, 0, 0x4185C000, 0x10, 0x41854000, 0xB4, 0x41858000, 0,
-            0x4303C000, 0x14A528, 0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x4143C000, 0x22C"/>
+            Resources="0x4183C000, 0x10, 0x41834000, 0xC8, 0x41838000, 0, 0x4185C000, 0x10, 0x41854000, 0xC8, 0x41858000, 0,
+            0x4303C000, 0x14A528, 0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x4143C000, 0x22C,
+            0x4187401D, 0x46, 0x4187801E, 0x46"/>
 
         <!--camera 60fps DMM -->
         <!--CPU-LARGE-LLC BWMON - Set sample_ms 16 -->
-        <!--CPU-LARGE-LLC BWMON - Set io_percent 120 -->
+        <!--CPU-LARGE-LLC BWMON - Set io_percent 180 -->
         <!--CPU-LARGE-LLC BWMON - Set hyst_length hist memory 0 -->
         <!--CPU-MEDIUM-LLC BWMON - Set sample_ms 16 -->
-        <!--CPU-MEDIUM-LLC BWMON - Set io_percent 120 -->
+        <!--CPU-MEDIUM-LLC BWMON - Set io_percent 180 -->
         <!--CPU-MEDIUM-LLC BWMON - Set hyst_length hist memory 0 -->
         <!--CPU-LLC-DDR BWMON - Set min_freq 1555 -->
         <!--B CPU - Disable schedutil PL -->
         <!--B CPU - Set hispeed load 99 -->
         <!-- MPCTLV3_SCHED_IDLE_ENOUGH  0 -->
         <!-- MPCTLV3_CORE_CTL_OFFLINE_DELAY_MS_BIG 0 -->
-        <!-- Medium cluster min freq to 960MHz -->
+        <!-- Medium cluster min freq to 1152MHz -->
+        <!-- MPCTLV3_MIN_ONLINE_CPU_CLUSTER_BIG  6 -->
+        <!-- MPCTLV3_CORE_CTL_CPU_NOT_PREFERRED_BIG  000000 -->
         <Config
             Id="0x00001340" Enable="true" Timeout="0" Target="sun"
             Resources="0x4183C000, 0x10, 0x41834000, 0xB4, 0x41838000, 0, 0x4185C000, 0x10, 0x41854000, 0xB4, 0x41858000, 0,
@@ -282,10 +288,10 @@
 
         <!--camera 8k30-->
         <!--CPU-LARGE-LLC BWMON - Set sample_ms 33 -->
-        <!--CPU-LARGE-LLC BWMON - Set io_percent 120 -->
+        <!--CPU-LARGE-LLC BWMON - Set io_percent 180 -->
         <!--CPU-LARGE-LLC BWMON - Set hyst_length hist memory 0 -->
         <!--CPU-MEDIUM-LLC BWMON - Set sample_ms 33 -->
-        <!--CPU-MEDIUM-LLC BWMON - Set io_percent 120 -->
+        <!--CPU-MEDIUM-LLC BWMON - Set io_percent 180 -->
         <!--CPU-MEDIUM-LLC BWMON - Set hyst_length hist memory 0 -->
         <!--B CPU - Disable schedutil PL -->
         <!--B CPU - Set hispeed load 99 -->
@@ -294,10 +300,13 @@
         <!-- MPCTLV3_SCHEDUTIL_HISPEED_FREQ_CLUSTER_BIG  556MHz -->
         <!-- MPCTLV3_MIN_ONLINE_CPU_CLUSTER_BIG  3 -->
         <!-- MPCTLV3_CORE_CTL_CPU_NOT_PREFERRED_BIG  000111 -->
+        <!-- MPCTLV3_GOLD_CPU_LLCC_BW_AB_SCALE  70 -->
+        <!-- MPCTLV3_CPU_LLCC_BW_AB_SCALE  70 -->
         <Config
             Id="0x00001335" Enable="true" Timeout="0" Target="sun"
             Resources="0x4183C000, 0x21, 0x41834000, 0xB4, 0x41838000, 0, 0x4185C000, 0x21, 0x41854000, 0xB4, 0x41858000, 0,
-            0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x4143C000, 0x22C, 0x41000000, 3, 0x4100C000, 0x7"/>
+            0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x4143C000, 0x22C, 0x41000000, 3, 0x4100C000, 0x7,
+            0x4187401D, 0x46, 0x4187801E, 0x46"/>
 
         <!--video encode HFR 480 fps-->
         <!-- MPCTLV3_ALL_CPUS_PWR_CLPS_DIS, 0x1 -->
