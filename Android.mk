@@ -12,6 +12,10 @@ LOCAL_SRC_FILES := power-common.c metadata-parser.c utils.c list.c hint-data.c p
 LOCAL_C_INCLUDES := external/libxml2/include \
                     external/icu/icu4c/source/common
 
+ifeq ($(TARGET_SUPPORTS_WEAR_OS), true)
+LOCAL_CFLAGS += -DENABLE_POWER_HINT_FOR_WEAR
+endif
+
 ifeq ($(call is-board-platform-in-list,msm8937), true)
 LOCAL_SRC_FILES += power-8937.c
 endif
@@ -21,8 +25,9 @@ LOCAL_SRC_FILES += power-monaco.c
 endif
 
 ifeq ($(TARGET_USES_INTERACTION_BOOST),true)
-    LOCAL_CFLAGS += -DINTERACTION_BOOST
+LOCAL_CFLAGS += -DINTERACTION_BOOST
 endif
+
 LOCAL_MODULE := android.hardware.power-service
 LOCAL_INIT_RC := android.hardware.power-service.rc
 LOCAL_MODULE_TAGS := optional
