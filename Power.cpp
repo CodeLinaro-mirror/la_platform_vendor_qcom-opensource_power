@@ -42,8 +42,6 @@
 #include <thread>
 
 #include <aidl/android/hardware/power/BnPower.h>
-
-#include <android-base/logging.h>
 #include <android/binder_manager.h>
 #include <android/binder_process.h>
 
@@ -54,6 +52,8 @@ using ::aidl::android::hardware::power::Boost;
 using ::aidl::android::hardware::common::fmq::MQDescriptor;
 using ::aidl::android::hardware::common::fmq::SynchronizedReadWrite;
 using ::aidl::android::hardware::power::ChannelMessage;
+using ::aidl::android::hardware::power::CompositionData;
+using ::aidl::android::hardware::power::CompositionUpdate;
 using ::android::AidlMessageQueue;
 
 using ::ndk::ScopedAStatus;
@@ -66,7 +66,12 @@ namespace power {
 namespace impl {
 
 void setInteractive(bool interactive) {
-   set_interactive(interactive ? 1:0);
+    set_interactive(interactive ? 1:0);
+}
+
+template <class T>
+constexpr size_t enum_size() {
+    return static_cast<size_t>(*(ndk::enum_range<T>().end() - 1)) + 1;
 }
 
 ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
@@ -128,7 +133,7 @@ ndk::ScopedAStatus Power::isModeSupported(Mode type, bool* _aidl_return) {
 
 ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
     LOG(INFO) << "Power setBoost: " << static_cast<int32_t>(type)
-                 << ", duration: " << durationMs;
+                << ", duration: " << durationMs;
     return ndk::ScopedAStatus::ok();
 }
 
@@ -136,6 +141,14 @@ ndk::ScopedAStatus Power::isBoostSupported(Boost type, bool* _aidl_return) {
     LOG(INFO) << "Power isBoostSupported: " << static_cast<int32_t>(type);
     *_aidl_return = false;
     return ndk::ScopedAStatus::ok();
+}
+
+ndk::ScopedAStatus Power::getCpuHeadroom(const CpuHeadroomParams&, CpuHeadroomResult*) {
+    return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+}
+
+ndk::ScopedAStatus Power::getGpuHeadroom(const GpuHeadroomParams&, GpuHeadroomResult*) {
+    return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
 }
 
 ndk::ScopedAStatus Power::createHintSession(int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
@@ -146,13 +159,13 @@ ndk::ScopedAStatus Power::createHintSession(int32_t tgid, int32_t uid, const std
         *_aidl_return = nullptr;
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
-    *_aidl_return = setPowerHintSession(tgid, uid, threadIds);
+    *_aidl_return = setPowerHintSession(tgid, uid, threadIds, durationNanos);
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Power::createHintSessionWithConfig(
         int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
-        SessionTag, SessionConfig* config, std::shared_ptr<IPowerHintSession>* _aidl_return) 
+        SessionTag, SessionConfig* config, std::shared_ptr<IPowerHintSession>* _aidl_return)
 {
     auto out = createHintSession(tgid, uid, threadIds, durationNanos, _aidl_return);
     static_cast<PowerHintSessionImpl*>(_aidl_return->get())->getSessionConfig(config);
@@ -182,6 +195,45 @@ ndk::ScopedAStatus Power::closeSessionChannel(int32_t, int32_t) {
 ndk::ScopedAStatus Power::getHintSessionPreferredRate(int64_t* outNanoseconds) {
     LOG(INFO) << "Power getHintSessionPreferredRate";
     *outNanoseconds = getSessionPreferredRate();
+    return ndk::ScopedAStatus::ok();
+}
+
+template <class E>
+int64_t bitsForEnum() {
+    return static_cast<int64_t>(std::bitset<enum_size<E>()>().set().to_ullong());
+}
+
+ndk::ScopedAStatus Power::getSupportInfo(SupportInfo* _aidl_return) {
+    static SupportInfo supportInfo = {.usesSessions = true,
+                                    .modes = bitsForEnum<Mode>(),
+                                    .boosts = bitsForEnum<Boost>(),
+                                    .sessionHints = 0b11111,
+                                    .sessionModes = 0b0,
+                                    .sessionTags = 0b1000, // Only game session supported
+                                    .compositionData = {
+                                            .isSupported = false,
+                                            .disableGpuFences = false,
+                                            .maxBatchSize = 1,
+                                            .alwaysBatch = false,
+                                    },
+                                    .headroom = {
+                                            .isCpuSupported = false,
+                                            .isGpuSupported = false,
+                                            .cpuMinIntervalMillis = 0,
+                                            .gpuMinIntervalMillis = 0,
+                                    }};
+    // Copy the support object into the binder
+    *_aidl_return = supportInfo;
+    return ndk::ScopedAStatus::ok();
+}
+
+ndk::ScopedAStatus Power::sendCompositionData(const std::vector<CompositionData>&) {
+    LOG(INFO) << "Composition data received!";
+    return ndk::ScopedAStatus::ok();
+}
+
+ndk::ScopedAStatus Power::sendCompositionUpdate(const CompositionUpdate&) {
+    LOG(INFO) << "Composition update received!";
     return ndk::ScopedAStatus::ok();
 }
 
