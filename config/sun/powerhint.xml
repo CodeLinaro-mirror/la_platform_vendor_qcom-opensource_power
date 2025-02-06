@@ -414,11 +414,13 @@
 
         <!--camera 60fps-->
         <!--CPU-LLC BWMON - Set sample_ms 16 -->
-        <!--CPU-LLC BWMON - Set io_percent 100 -->
+        <!--CPU-LLC BWMON - Set io_percent 150 -->
         <!--CPU-LLC BWMON - Set hyst_length hist memory 0 -->
+        <!--CPU-LLC BWMON - Set ab_scale 50 -->
         <!--CPU-LLC-DDR BWMON - Set sample_ms 16 -->
-        <!--CPU-LLC-DDR BWMON - Set io_percent 100 -->
+        <!--CPU-LLC-DDR BWMON - Set io_percent 150 -->
         <!--CPU-LLC-DDR BWMON - Set hyst_length hist memory 0 -->
+        <!--CPU-LLC-DDR BWMON - Set ab_scale 50 -->
         <!--CPU-LLC-DDR BWMON - Set min_freq 1555 -->
         <!--L CPU max freq 1075200 -->
         <!--L CPU - Disable schedutil PL -->
@@ -433,8 +435,8 @@
         <!-- MPCTLV3_GOLD_DYNPREFETCHER_OPCODE 1 -->
         <Config
             Id="0x00001332" Enable="true" Timeout="0" Target="tuna"
-            Resources="0x4183C000, 0x10, 0x41834000, 0x64, 0x41838000, 0, 0x43034000, 0x10,
-            0x43020000, 0x64, 0x43024000, 0, 0x4303C000, 0x17BA38, 0x40804100, 0x433,
+            Resources="0x4183C000, 0x10, 0x41834000, 0x96, 0x41838000, 0, 0x41878000, 0x32, 0x43034000, 0x10,
+            0x43020000, 0x96, 0x43024000, 0, 0x43048000, 0x32, 0x4303C000, 0x17BA38, 0x40804100, 0x433,
             0x41444100, 0, 0x41444000, 0, 0x41440000, 0x63, 0x40CE0000, 0x0032000A,
             0x40CE0200, 0x00550055, 0x41008000, 0, 0x41008100, 0, 0x41008200, 0, 0x43C0C000, 0,
             0x4143C100, 0x2EC, 0x41010300, 1, 0x41014300, 0x14, 0x42C40000, 1"/>
