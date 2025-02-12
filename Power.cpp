@@ -150,14 +150,14 @@ ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
 #ifdef ENABLE_POWER_HINT_FOR_WEAR
     if (type == Boost::DISPLAY_UPDATE_IMMINENT) {
         if (soc_id == 486 || soc_id == 517) {
-            int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2, 0x42804000, 0x3};
+            int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2};
             int duration = 50;
             interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
         }
     }
     else if(type == Boost::INTERACTION) {
         if (soc_id == 486 || soc_id == 517) {
-            int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2, 0x42804000, 0x0};
+            int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2};
             int duration = 500;
             interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
         }
