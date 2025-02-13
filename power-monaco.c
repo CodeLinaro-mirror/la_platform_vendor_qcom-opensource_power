@@ -26,6 +26,12 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+/*
+ * Changes from Qualcomm Innovation Center, Inc. are provided under the following license:
+ * Copyright (c) 2025 Qualcomm Innovation Center, Inc. All rights reserved.
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
+ */
+
 #define LOG_NIDEBUG 0
 
 #include <errno.h>
@@ -62,8 +68,13 @@ int  set_interactive_override(int on)
      char *s = on? "1" : "0";
      int rc = -1;
 
-     rc = sysfs_write(SLATERSB_ENABLE_PATH, s);
-     if(rc != 0)
-         ALOGE("RSB command is not processed\n");
+     char prop_value[PROPERTY_VALUE_MAX] = {'\0'};
+     int aon_len = property_get("ro.vendor.qc_aon_presence", prop_value, NULL);
+     ALOGD("aon_len: %d, ro.vendor.qc_aon_presence: %d \n", aon_len, atoi(prop_value));
+     if (atoi(prop_value) != 0) {
+        rc = sysfs_write(SLATERSB_ENABLE_PATH, s);
+        if(rc != 0)
+            ALOGE("RSB command is not processed\n");
+     }
      return HINT_HANDLED;
 }
