@@ -31,162 +31,215 @@
  * SPDX-License-Identifier: BSD-3-Clause-Clear
  */
 
-#define LOG_TAG "QTI PowerHAL"
+ #define LOG_TAG "QTI PowerHAL"
 
-#include "Power.h"
-#include "PowerHintSession.h"
-
-#include <android-base/logging.h>
-#include <fmq/AidlMessageQueue.h>
-#include <fmq/EventFlag.h>
-#include <thread>
-
-#include <aidl/android/hardware/power/BnPower.h>
-
-#include <android-base/logging.h>
-#include <android/binder_manager.h>
-#include <android/binder_process.h>
-
-using ::aidl::android::hardware::power::BnPower;
-using ::aidl::android::hardware::power::IPower;
-using ::aidl::android::hardware::power::Mode;
-using ::aidl::android::hardware::power::Boost;
-using ::aidl::android::hardware::common::fmq::MQDescriptor;
-using ::aidl::android::hardware::common::fmq::SynchronizedReadWrite;
-using ::aidl::android::hardware::power::ChannelMessage;
-using ::android::AidlMessageQueue;
-
-using ::ndk::ScopedAStatus;
-using ::ndk::SharedRefBase;
-
-namespace aidl {
-namespace android {
-namespace hardware {
-namespace power {
-namespace impl {
-
-void setInteractive(bool interactive) {
-   set_interactive(interactive ? 1:0);
-}
-
-ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
-    LOG(INFO) << "Power setMode: " << static_cast<int32_t>(type) << " to: " << enabled;
-    switch(type){
-        case Mode::DOUBLE_TAP_TO_WAKE:
-        case Mode::LOW_POWER:
-        case Mode::LAUNCH:
-        case Mode::DEVICE_IDLE:
-        case Mode::DISPLAY_INACTIVE:
-        case Mode::AUDIO_STREAMING_LOW_LATENCY:
-        case Mode::CAMERA_STREAMING_SECURE:
-        case Mode::CAMERA_STREAMING_LOW:
-        case Mode::CAMERA_STREAMING_MID:
-        case Mode::CAMERA_STREAMING_HIGH:
-        case Mode::VR:
-            LOG(INFO) << "Mode " << static_cast<int32_t>(type) << "Not Supported";
-            break;
-        case Mode::EXPENSIVE_RENDERING:
-            set_expensive_rendering(enabled);
-            break;
-        case Mode::INTERACTIVE:
-            setInteractive(enabled);
-            power_hint(POWER_HINT_INTERACTION, NULL);
-            break;
-        case Mode::SUSTAINED_PERFORMANCE:
-        case Mode::FIXED_PERFORMANCE:
-            power_hint(POWER_HINT_SUSTAINED_PERFORMANCE, NULL);
-            break;
-        default:
-            LOG(INFO) << "Mode " << static_cast<int32_t>(type) << "Not Supported";
-            break;
-    }
-    return ndk::ScopedAStatus::ok();
-}
-
-ndk::ScopedAStatus Power::isModeSupported(Mode type, bool* _aidl_return) {
-    LOG(INFO) << "Power isModeSupported: " << static_cast<int32_t>(type);
-
-    switch(type){
-        case Mode::EXPENSIVE_RENDERING:
-            if (is_expensive_rendering_supported()) {
-                *_aidl_return = true;
-            } else {
-                *_aidl_return = false;
-            }
-            break;
-        case Mode::INTERACTIVE:
-        case Mode::SUSTAINED_PERFORMANCE:
-        case Mode::FIXED_PERFORMANCE:
-            *_aidl_return = true;
-            break;
-        default:
-            *_aidl_return = false;
-            break;
-    }
-    return ndk::ScopedAStatus::ok();
-}
-
-ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
-    LOG(INFO) << "Power setBoost: " << static_cast<int32_t>(type)
+ #include "Power.h"
+ #include "PowerHintSession.h"
+ 
+ #include <android-base/logging.h>
+ #include <fmq/AidlMessageQueue.h>
+ #include <fmq/EventFlag.h>
+ #include <thread>
+ 
+ #include <aidl/android/hardware/power/BnPower.h>
+ #include <android/binder_manager.h>
+ #include <android/binder_process.h>
+ 
+ using ::aidl::android::hardware::power::BnPower;
+ using ::aidl::android::hardware::power::IPower;
+ using ::aidl::android::hardware::power::Mode;
+ using ::aidl::android::hardware::power::Boost;
+ using ::aidl::android::hardware::common::fmq::MQDescriptor;
+ using ::aidl::android::hardware::common::fmq::SynchronizedReadWrite;
+ using ::aidl::android::hardware::power::ChannelMessage;
+ using ::aidl::android::hardware::power::CompositionData;
+ using ::aidl::android::hardware::power::CompositionUpdate;
+ using ::android::AidlMessageQueue;
+ 
+ using ::ndk::ScopedAStatus;
+ using ::ndk::SharedRefBase;
+ 
+ namespace aidl {
+ namespace android {
+ namespace hardware {
+ namespace power {
+ namespace impl {
+ 
+ void setInteractive(bool interactive) {
+     set_interactive(interactive ? 1:0);
+ }
+ 
+ template <class T>
+ constexpr size_t enum_size() {
+     return static_cast<size_t>(*(ndk::enum_range<T>().end() - 1)) + 1;
+ }
+ 
+ ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
+     LOG(INFO) << "Power setMode: " << static_cast<int32_t>(type) << " to: " << enabled;
+     switch(type){
+         case Mode::DOUBLE_TAP_TO_WAKE:
+         case Mode::LOW_POWER:
+         case Mode::LAUNCH:
+         case Mode::DEVICE_IDLE:
+         case Mode::DISPLAY_INACTIVE:
+         case Mode::AUDIO_STREAMING_LOW_LATENCY:
+         case Mode::CAMERA_STREAMING_SECURE:
+         case Mode::CAMERA_STREAMING_LOW:
+         case Mode::CAMERA_STREAMING_MID:
+         case Mode::CAMERA_STREAMING_HIGH:
+         case Mode::VR:
+             LOG(INFO) << "Mode " << static_cast<int32_t>(type) << "Not Supported";
+             break;
+         case Mode::EXPENSIVE_RENDERING:
+             set_expensive_rendering(enabled);
+             break;
+         case Mode::INTERACTIVE:
+             setInteractive(enabled);
+             power_hint(POWER_HINT_INTERACTION, NULL);
+             break;
+         case Mode::SUSTAINED_PERFORMANCE:
+         case Mode::FIXED_PERFORMANCE:
+             power_hint(POWER_HINT_SUSTAINED_PERFORMANCE, NULL);
+             break;
+         default:
+             LOG(INFO) << "Mode " << static_cast<int32_t>(type) << "Not Supported";
+             break;
+     }
+     return ndk::ScopedAStatus::ok();
+ }
+ 
+ ndk::ScopedAStatus Power::isModeSupported(Mode type, bool* _aidl_return) {
+     LOG(INFO) << "Power isModeSupported: " << static_cast<int32_t>(type);
+ 
+     switch(type){
+         case Mode::EXPENSIVE_RENDERING:
+             if (is_expensive_rendering_supported()) {
+                 *_aidl_return = true;
+             } else {
+                 *_aidl_return = false;
+             }
+             break;
+         case Mode::INTERACTIVE:
+         case Mode::SUSTAINED_PERFORMANCE:
+         case Mode::FIXED_PERFORMANCE:
+             *_aidl_return = true;
+             break;
+         default:
+             *_aidl_return = false;
+             break;
+     }
+     return ndk::ScopedAStatus::ok();
+ }
+ 
+ ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
+     LOG(INFO) << "Power setBoost: " << static_cast<int32_t>(type)
                  << ", duration: " << durationMs;
-    return ndk::ScopedAStatus::ok();
-}
-
-ndk::ScopedAStatus Power::isBoostSupported(Boost type, bool* _aidl_return) {
-    LOG(INFO) << "Power isBoostSupported: " << static_cast<int32_t>(type);
-    *_aidl_return = false;
-    return ndk::ScopedAStatus::ok();
-}
-
-ndk::ScopedAStatus Power::createHintSession(int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
-                                            std::shared_ptr<IPowerHintSession>* _aidl_return) {
-    LOG(INFO) << "Power createHintSession";
-    if (threadIds.size() == 0) {
-        LOG(ERROR) << "Error: threadIds.size() shouldn't be " << threadIds.size();
-        *_aidl_return = nullptr;
-        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
-    }
-    *_aidl_return = setPowerHintSession(tgid, uid, threadIds);
-    return ndk::ScopedAStatus::ok();
-}
-
-ndk::ScopedAStatus Power::createHintSessionWithConfig(
-        int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
-        SessionTag, SessionConfig* config, std::shared_ptr<IPowerHintSession>* _aidl_return) 
-{
-    auto out = createHintSession(tgid, uid, threadIds, durationNanos, _aidl_return);
-    static_cast<PowerHintSessionImpl*>(_aidl_return->get())->getSessionConfig(config);
-    return out;
-}
-
-ndk::ScopedAStatus Power::getSessionChannel(int32_t, int32_t, ChannelConfig* _aidl_return) {
-    static AidlMessageQueue<ChannelMessage, SynchronizedReadWrite> stubQueue{20, true};
-    static std::thread stubThread([&] {
-        ChannelMessage data;
-        // This loop will only run while there is data waiting
-        // to be processed, and blocks on a futex all other times
-        while (stubQueue.readBlocking(&data, 1, 0)) {
-        }
-    });
-    _aidl_return->channelDescriptor = stubQueue.dupeDesc();
-    _aidl_return->readFlagBitmask = 0x01;
-    _aidl_return->writeFlagBitmask = 0x02;
-    _aidl_return->eventFlagDescriptor = std::nullopt;
-    return ndk::ScopedAStatus::ok();
-}
-
-ndk::ScopedAStatus Power::closeSessionChannel(int32_t, int32_t) {
-    return ndk::ScopedAStatus::ok();
-}
-
-ndk::ScopedAStatus Power::getHintSessionPreferredRate(int64_t* outNanoseconds) {
-    LOG(INFO) << "Power getHintSessionPreferredRate";
-    *outNanoseconds = getSessionPreferredRate();
-    return ndk::ScopedAStatus::ok();
-}
-
-}  // namespace impl
-}  // namespace power
-}  // namespace hardware
-}  // namespace android
-}  // namespace aidl
+     return ndk::ScopedAStatus::ok();
+ }
+ 
+ ndk::ScopedAStatus Power::isBoostSupported(Boost type, bool* _aidl_return) {
+     LOG(INFO) << "Power isBoostSupported: " << static_cast<int32_t>(type);
+     *_aidl_return = false;
+     return ndk::ScopedAStatus::ok();
+ }
+ 
+ ndk::ScopedAStatus Power::getCpuHeadroom(const CpuHeadroomParams&, CpuHeadroomResult*) {
+     return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+ }
+ 
+ ndk::ScopedAStatus Power::getGpuHeadroom(const GpuHeadroomParams&, GpuHeadroomResult*) {
+     return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+ }
+ 
+ ndk::ScopedAStatus Power::createHintSession(int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
+                                             std::shared_ptr<IPowerHintSession>* _aidl_return) {
+     LOG(INFO) << "Power createHintSession";
+     if (threadIds.size() == 0) {
+         LOG(ERROR) << "Error: threadIds.size() shouldn't be " << threadIds.size();
+         *_aidl_return = nullptr;
+         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+     }
+     *_aidl_return = setPowerHintSession(tgid, uid, threadIds, durationNanos);
+     return ndk::ScopedAStatus::ok();
+ }
+ 
+ ndk::ScopedAStatus Power::createHintSessionWithConfig(
+         int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
+         SessionTag, SessionConfig* config, std::shared_ptr<IPowerHintSession>* _aidl_return)
+ {
+     auto out = createHintSession(tgid, uid, threadIds, durationNanos, _aidl_return);
+     static_cast<PowerHintSessionImpl*>(_aidl_return->get())->getSessionConfig(config);
+     return out;
+ }
+ 
+ ndk::ScopedAStatus Power::getSessionChannel(int32_t, int32_t, ChannelConfig* _aidl_return) {
+     static AidlMessageQueue<ChannelMessage, SynchronizedReadWrite> stubQueue{20, true};
+     static std::thread stubThread([&] {
+         ChannelMessage data;
+         // This loop will only run while there is data waiting
+         // to be processed, and blocks on a futex all other times
+         while (stubQueue.readBlocking(&data, 1, 0)) {
+         }
+     });
+     _aidl_return->channelDescriptor = stubQueue.dupeDesc();
+     _aidl_return->readFlagBitmask = 0x01;
+     _aidl_return->writeFlagBitmask = 0x02;
+     _aidl_return->eventFlagDescriptor = std::nullopt;
+     return ndk::ScopedAStatus::ok();
+ }
+ 
+ ndk::ScopedAStatus Power::closeSessionChannel(int32_t, int32_t) {
+     return ndk::ScopedAStatus::ok();
+ }
+ 
+ ndk::ScopedAStatus Power::getHintSessionPreferredRate(int64_t* outNanoseconds) {
+     LOG(INFO) << "Power getHintSessionPreferredRate";
+     *outNanoseconds = getSessionPreferredRate();
+     return ndk::ScopedAStatus::ok();
+ }
+ 
+ template <class E>
+ int64_t bitsForEnum() {
+     return static_cast<int64_t>(std::bitset<enum_size<E>()>().set().to_ullong());
+ }
+ 
+ ndk::ScopedAStatus Power::getSupportInfo(SupportInfo* _aidl_return) {
+     static SupportInfo supportInfo = {.usesSessions = true,
+                                     .modes = bitsForEnum<Mode>(),
+                                     .boosts = bitsForEnum<Boost>(),
+                                     .sessionHints = 0b11111,
+                                     .sessionModes = 0b0,
+                                     .sessionTags = 0b1000, // Only game session supported
+                                     .compositionData = {
+                                             .isSupported = false,
+                                             .disableGpuFences = false,
+                                             .maxBatchSize = 1,
+                                             .alwaysBatch = false,
+                                     },
+                                     .headroom = {
+                                             .isCpuSupported = false,
+                                             .isGpuSupported = false,
+                                             .cpuMinIntervalMillis = 0,
+                                             .gpuMinIntervalMillis = 0,
+                                     }};
+     // Copy the support object into the binder
+     *_aidl_return = supportInfo;
+     return ndk::ScopedAStatus::ok();
+ }
+ 
+ ndk::ScopedAStatus Power::sendCompositionData(const std::vector<CompositionData>&) {
+     LOG(INFO) << "Composition data received!";
+     return ndk::ScopedAStatus::ok();
+ }
+ 
+ ndk::ScopedAStatus Power::sendCompositionUpdate(const CompositionUpdate&) {
+     LOG(INFO) << "Composition update received!";
+     return ndk::ScopedAStatus::ok();
+ }
+ 
+ }  // namespace impl
+ }  // namespace power
+ }  // namespace hardware
+ }  // namespace android
+ }  // namespace aidl
+ 
