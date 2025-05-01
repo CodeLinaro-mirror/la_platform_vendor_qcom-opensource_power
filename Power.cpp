@@ -66,7 +66,7 @@ namespace power {
 namespace impl {
 
 void setInteractive(bool interactive) {
-   set_interactive(interactive ? 1:0);
+    set_interactive(interactive ? 1:0);
 }
 
 ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
@@ -128,7 +128,7 @@ ndk::ScopedAStatus Power::isModeSupported(Mode type, bool* _aidl_return) {
 
 ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
     LOG(INFO) << "Power setBoost: " << static_cast<int32_t>(type)
-                 << ", duration: " << durationMs;
+                << ", duration: " << durationMs;
     return ndk::ScopedAStatus::ok();
 }
 
@@ -146,13 +146,13 @@ ndk::ScopedAStatus Power::createHintSession(int32_t tgid, int32_t uid, const std
         *_aidl_return = nullptr;
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
-    *_aidl_return = setPowerHintSession(tgid, uid, threadIds);
+    *_aidl_return = setPowerHintSession(tgid, uid, threadIds, durationNanos);
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus Power::createHintSessionWithConfig(
         int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
-        SessionTag, SessionConfig* config, std::shared_ptr<IPowerHintSession>* _aidl_return) 
+        SessionTag, SessionConfig* config, std::shared_ptr<IPowerHintSession>* _aidl_return)
 {
     auto out = createHintSession(tgid, uid, threadIds, durationNanos, _aidl_return);
     static_cast<PowerHintSessionImpl*>(_aidl_return->get())->getSessionConfig(config);
