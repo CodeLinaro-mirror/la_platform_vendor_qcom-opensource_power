@@ -99,6 +99,7 @@ LOCAL_MODULE := android.hardware.power-service
 LOCAL_INIT_RC := android.hardware.power-service.rc
 LOCAL_MODULE_TAGS := optional
 LOCAL_CFLAGS += -Wno-unused-parameter -Wno-unused-variable
+LOCAL_CFLAGS += -Werror=pointer-integer-compare
 LOCAL_VENDOR_MODULE := true
 include $(BUILD_EXECUTABLE)
 endif
