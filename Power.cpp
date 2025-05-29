@@ -205,8 +205,8 @@
  
  ndk::ScopedAStatus Power::getSupportInfo(SupportInfo* _aidl_return) {
      static SupportInfo supportInfo = {.usesSessions = true,
-                                     .modes = bitsForEnum<Mode>(),
-                                     .boosts = bitsForEnum<Boost>(),
+                                     .modes = 0b10001100,
+                                     .boosts = 0b0,
                                      .sessionHints = 0b11111,
                                      .sessionModes = 0b0,
                                      .sessionTags = 0b1000, // Only game session supported
