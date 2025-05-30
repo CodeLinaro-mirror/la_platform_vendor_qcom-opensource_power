@@ -1,3 +1,4 @@
+ifeq ($(TARGET_BOARD_PLATFORM), monaco)
 LOCAL_PATH := $(call my-dir)
 ifeq ($(call is-vendor-board-platform,QCOM),true)
 
@@ -35,4 +36,5 @@ LOCAL_CFLAGS += -Wno-unused-parameter -Wno-unused-variable
 LOCAL_VENDOR_MODULE := true
 LOCAL_VINTF_FRAGMENTS := power.xml
 include $(BUILD_EXECUTABLE)
+endif
 endif
