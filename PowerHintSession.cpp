@@ -10,7 +10,12 @@
 #include <dlfcn.h>
 #include <cmath>
 #include <android-base/logging.h>
+#include <android/binder_manager.h>
 #include "android/binder_auto_utils.h"
+#include <aidl/vendor/qti/hardware/display/config/IDisplayConfig.h>
+
+using aidl::vendor::qti::hardware::display::config::IDisplayConfig;
+using aidl::vendor::qti::hardware::display::config::DisplayType;
 
 #define LOG_TAG "QTI PowerHAL"
 
@@ -44,10 +49,15 @@ unsigned int mMaxBoostCount;
 unsigned int mBoostDurationSec;
 std::mutex mBoostLock;
 
-static std::string printThreads(const std::vector<int32_t>& threadIds, int numThreads) {
+template <typename T>
+static std::string printValues(const std::vector<T>& values, int count) {
     std::string str;
-    for(int i = 0; i < numThreads; i++) {
-        str = str + std::to_string(threadIds[i]) + " ";
+    int limit = std::min(count, static_cast<int>(values.size()));
+    for(int i = 0; i < limit; i++) {
+        str += std::to_string(values[i]);
+        if(i < limit-1) {
+            str += " ";
+        }
     }
     return str;
 }
@@ -106,7 +116,7 @@ bool PowerHintSessionImpl::taskLoadBoost(int loadType) {
             // Do not update boost sum if handle is not acquired
             return false;
         }
-        if(mEnableDebug) LOG(INFO) << "Handle " << handle << " for threads " << printThreads(mThreadIds, numThreads);
+        if(mEnableDebug) LOG(INFO) << "Handle " << handle << " for threads " << printValues(mThreadIds, numThreads);
     }
     mTLBHandle = handle;
     mTLBoostSum = boostSum;
@@ -189,6 +199,26 @@ bool initTopAppInfo(std::string &topAppName) {
     return send_perf_get_feedback(VENDOR_FEEDBACK_WORKLOAD_TYPE, topAppName.c_str()) == GAME_WORKLOAD_TYPE;
 }
 
+void initSupportedFps(std::vector<int32_t> &supportedFps) {
+    ndk::SpAIBinder binder(AServiceManager_checkService("vendor.qti.hardware.display.config.IDisplayConfig/default"));
+    if(binder.get() == nullptr) {
+        LOG(ERROR) << "DisplayConfig AIDL is not available";
+        return;
+    }
+    auto aidlDisplayConfigIntf = IDisplayConfig::fromBinder(binder);
+    if(aidlDisplayConfigIntf == nullptr) {
+        LOG(ERROR) << "Failed to obtain DisplayConfig interface";
+        return;
+    }
+    ndk::ScopedAStatus status = aidlDisplayConfigIntf->getSupportedDisplayRefreshRates(DisplayType::PRIMARY, &supportedFps);
+    if(!status.isOk()) {
+        LOG(ERROR) << "Failed to get supported display refresh rates";
+        return;
+    }
+    std::sort(supportedFps.begin(), supportedFps.end());
+    LOG(INFO) << "Supported display refresh rates: " << printValues(supportedFps, static_cast<int>(supportedFps.size()));
+}
+
 PowerHintSessionImpl::PowerHintSessionImpl(int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos){
     mUid = uid;
     mTgid = tgid;
@@ -209,6 +239,7 @@ PowerHintSessionImpl::PowerHintSessionImpl(int32_t tgid, int32_t uid, const std:
     mConsecutiveDownCount = 0;
     mTLBHandle = -1;
     mTLBoostSum = 0;
+    initSupportedFps(mSupportedFps);
     updateTargetWorkDuration(durationNanos);
     setSessionActivity(this, true);
 }
@@ -267,14 +298,24 @@ void PowerHintSessionImpl::hintLowCpuUtil() {
 
 ndk::ScopedAStatus PowerHintSessionImpl::updateTargetWorkDuration(int64_t in_targetDurationNanos){
     LOG(INFO) << "PowerHintSessionImpl::updateTargetWorkDuration: " << in_targetDurationNanos;
-    if(!mEnableAdpf || in_targetDurationNanos <= 0) {
+    if(!mEnableAdpf || in_targetDurationNanos <= 0 || in_targetDurationNanos == mTargetWorkDurationNanos) {
         return ndk::ScopedAStatus::ok();
     }
     mTargetWorkDurationNanos = in_targetDurationNanos;
     mThresholdNanos = mTargetWorkDurationNanos - (mTargetWorkDurationNanos/8);
-    // double durationInSeconds = static_cast<double>(mTargetWorkDurationNanos)/1'000'000'000.0;
-    // int targetFps = static_cast<int>(100.0 / durationInSeconds);
-    // send_perf_hint(VENDOR_HINT_PICARD_RENDER_RATE, mTopAppName.c_str(), targetFps, 0);
+    double durationInSeconds = static_cast<double>(mTargetWorkDurationNanos)/1000000000.0;
+    int fps = static_cast<int>(1.0/durationInSeconds);
+
+    if(mSupportedFps.empty()) {
+        return ndk::ScopedAStatus::ok();
+    }
+    auto it = std::lower_bound(mSupportedFps.begin(), mSupportedFps.end(), fps);
+    if (it == mSupportedFps.end()) {
+        it = mSupportedFps.end()-1;
+    }
+    int targetFps = *it;
+    int args[] = { targetFps * 100, 0 }; // {hintType, duration}
+    send_perf_event(VENDOR_HINT_PICARD_RENDER_RATE, mTopAppName.c_str(), 2, args);
     return ndk::ScopedAStatus::ok();
 }
 
@@ -418,7 +459,7 @@ ndk::ScopedAStatus PowerHintSessionImpl::sendHint(aidl::android::hardware::power
 }
 
 ndk::ScopedAStatus PowerHintSessionImpl::setThreads(const std::vector<int32_t>& threadIds){
-    LOG(INFO) << "PowerHintSessionImpl::setThreads: " << printThreads(threadIds, static_cast<int>(threadIds.size()));
+    LOG(INFO) << "PowerHintSessionImpl::setThreads: " << printValues(threadIds, static_cast<int>(threadIds.size()));
     if (threadIds.empty()) {
         LOG(ERROR) << "Threads list is empty";
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
