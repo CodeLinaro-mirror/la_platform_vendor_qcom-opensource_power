@@ -4,55 +4,45 @@
 */
 
 #include "PowerHintSession.h"
-#include "utils.h"
 #include "hint-data.h"
 #include "performance.h"
-#include <cutils/properties.h>
+#include "utils.h"
 #include <dlfcn.h>
 #include <cmath>
+#include <android-base/logging.h>
+#include "android/binder_auto_utils.h"
 
-#define PERF_EXT_LIB_PROP "ro.vendor.extension_library"
-#define MAX_PIPELINE_NUM_PROP "ro.vendor.perf.qape.max_pipeline_number"
-#define ADPF_DEBUG_PROP "vendor.debug.enable.adpf"
-#define DEFAULT_MAX_PIPELINE_NUM "3"
-#define PROP_VAL_LENGTH 92
+#define LOG_TAG "QTI PowerHAL"
 
-#define CPU_BOOST_HINT 0x0000104E
-#define MAX_THREADS 16
-#define MAX_BOOST 200
-#define MIN_BOOST -200
-
+#define VENDOR_FEEDBACK_WORKLOAD_TYPE 0x00001601
+#define VENDOR_FEEDBACK_TOPAPP_NAME 0x00001611
+#define VENDOR_HINT_PICARD_TOP_APP 0x0000104A
+#define VENDOR_HINT_PICARD_RENDER_RATE 0x0000104B
+#define VENDOR_HINT_PICARD_LOW_LAT 0x0000104C
+#define VENDOR_HINT_PICARD_HIGH_CPUUTIL 0x0000104D
+#define VENDOR_HINT_PICARD_LOAD_CHANGED 0x0000104E
 #define SCHED_TASK_LOAD_BOOST 0x43C04000
+
+#define GAME_WORKLOAD_TYPE 2
+
+#define CPU_BOOST_PCT 10
+#define GPU_BOOST_PCT 10
+#define MAX_THREADS 16
+
 #define MAX_TLB_THREADS 5
 #define MAX_TLB_PCT 80
 #define MIN_TLB_PCT -80
 #define INC_TLB_PCT 10
 #define DEC_TLB_PCT -10
 
-#include <android-base/logging.h>
-#include "android/binder_auto_utils.h"
-#define LOG_TAG "QTI PowerHAL"
-
 std::unordered_map<PowerHintSessionImpl*, int32_t> mPowerHintSessions;
 std::mutex mSessionLock;
 
-static int validateBoost(int boostVal, int boostSum) {
-    boostSum += boostVal;
-    if(boostSum > MAX_BOOST)
-        return MAX_BOOST;
-    else if(boostSum < MIN_BOOST)
-        return MIN_BOOST;
-    return boostSum;
-}
-
-void PowerHintSessionImpl::resetBoost() {
-    if(mHandle > 0) {
-        release_request(mHandle);
-        if(mDebug) LOG(INFO) << "Handle " << mHandle << " released";
-    }
-    mHandle = -1;
-    mLastAction = LOAD_RESET;
-}
+struct timeval mBoostStartTv;
+unsigned int mBoostCount;
+unsigned int mMaxBoostCount;
+unsigned int mBoostDurationSec;
+std::mutex mBoostLock;
 
 static std::string printThreads(const std::vector<int32_t>& threadIds, int numThreads) {
     std::string str;
@@ -62,38 +52,6 @@ static std::string printThreads(const std::vector<int32_t>& threadIds, int numTh
     return str;
 }
 
-bool PowerHintSessionImpl::perfBoost(int boostVal, int hintType) {
-    int tBoostSum = mBoostSum;
-    int mHandlePerfHint = -1;
-
-    if(hintType == LOAD_RESET){
-        resetBoost();
-        return true;
-    }
-
-    if(hintType == LOAD_RESUME && mLastAction != LOAD_RESET) {
-        tBoostSum = 0;
-    }
-
-    tBoostSum = validateBoost(boostVal, tBoostSum);
-    if(tBoostSum != 0) {
-        mHandlePerfHint = perf_hint_enable(CPU_BOOST_HINT, tBoostSum);
-        if(mHandlePerfHint < 0) {
-            LOG(ERROR) << "Unable to acquire Perf hint for" << CPU_BOOST_HINT;
-            return false;
-        }
-    }
-
-    if(mHandle > 0) {
-        release_request(mHandle);
-        if(mDebug) LOG(INFO) << "Handle " << mHandle << " released";
-    }
-    mBoostSum = tBoostSum;
-    mHandle = mHandlePerfHint;
-    mLastAction = hintType;
-    return true;
-}
-
 bool PowerHintSessionImpl::taskLoadBoost(int loadType) {
     int boostSum = mTLBoostSum;
     int handle = -1;
@@ -101,7 +59,7 @@ bool PowerHintSessionImpl::taskLoadBoost(int loadType) {
     if(loadType == LOAD_RESET) {
         if(mTLBHandle > 0) {
             release_request(mTLBHandle);
-            if(mDebug) LOG(INFO) << "Handle " << mTLBHandle << " released";
+            if(mEnableDebug) LOG(INFO) << "Handle " << mTLBHandle << " released";
         }
         mTLBHandle = -1;
         mTLBoostSum = 0;
@@ -114,8 +72,7 @@ bool PowerHintSessionImpl::taskLoadBoost(int loadType) {
         if(boostSum > MAX_TLB_PCT) {
             boostSum = MAX_TLB_PCT;
         }
-    }
-    else if(loadType == LOAD_DOWN) {
+    } else if(loadType == LOAD_DOWN) {
         boostSum += DEC_TLB_PCT;
         if(boostSum < MIN_TLB_PCT) {
             boostSum = MIN_TLB_PCT;
@@ -129,7 +86,7 @@ bool PowerHintSessionImpl::taskLoadBoost(int loadType) {
         }
         // Release old boost
         release_request(mTLBHandle);
-        if(mDebug) LOG(INFO) << "Handle " << mTLBHandle << " released";
+        if(mEnableDebug) LOG(INFO) << "Handle " << mTLBHandle << " released";
     }
     mTLBHandle = -1;
 
@@ -149,7 +106,7 @@ bool PowerHintSessionImpl::taskLoadBoost(int loadType) {
             // Do not update boost sum if handle is not acquired
             return false;
         }
-        if(mDebug) LOG(INFO) << "Handle " << handle << " for threads " << printThreads(mThreadIds, numThreads);
+        if(mEnableDebug) LOG(INFO) << "Handle " << handle << " for threads " << printThreads(mThreadIds, numThreads);
     }
     mTLBHandle = handle;
     mTLBoostSum = boostSum;
@@ -192,58 +149,67 @@ void setSessionActivity(PowerHintSessionImpl* session, bool flag) {
         mPowerHintSessions[session] = 0;
 }
 
-void PowerHintSessionImpl::getPerfProperties() {
-    char perfClientLib[PROPERTY_VALUE_MAX] = {0};
-    if(!property_get(PERF_EXT_LIB_PROP, perfClientLib, nullptr)) {
-        LOG(ERROR) << "Failed to get property " << PERF_EXT_LIB_PROP;
-        return;
-    }
-    void* perfClientLibHandle = dlopen(perfClientLib, RTLD_NOW);
-    if(!perfClientLibHandle) {
-        LOG(ERROR) << "Unable to open " << perfClientLib << ": " << dlerror();
-        return;
-    }
-    int (*perfGetPropExtn)(const char*, char*, size_t, const char*) = nullptr;
-    perfGetPropExtn = (int (*)(const char*, char*, size_t, const char*))dlsym(perfClientLibHandle, "perf_get_prop_extn");
-    if(!perfGetPropExtn) {
-        LOG(ERROR) << "Unable to find perf_get_prop_extn function in " << perfClientLib << ": " << dlerror();
-    }
-    else {
-        char debugEnable[PROP_VAL_LENGTH] = {0};
-        perfGetPropExtn(ADPF_DEBUG_PROP, debugEnable, PROP_VAL_LENGTH, "0");
-        mDebug = atoi(debugEnable) == 1;
+int getMaxBoostCount() {
+    std::lock_guard<std::mutex> lock(mBoostLock);
+    char property[PROPERTY_VALUE_MAX];
+    strlcpy(property, perf_get_property("ro.vendor.perf.qape.max_boost_count", "3").value, PROPERTY_VALUE_MAX);
+    return atoi(property);
+}
 
-        char maxPipelineThread[PROP_VAL_LENGTH] = {0};
-        perfGetPropExtn(MAX_PIPELINE_NUM_PROP, maxPipelineThread, PROP_VAL_LENGTH, DEFAULT_MAX_PIPELINE_NUM);
-        mMaxPipelineThreads = atoi(maxPipelineThread);
-        if(mDebug) LOG(INFO) << "Max pipeline thread count: " << mMaxPipelineThreads;
+int getMaxBoostDuration() {
+    std::lock_guard<std::mutex> lock(mBoostLock);
+    char property[PROPERTY_VALUE_MAX];
+    strlcpy(property, perf_get_property("ro.vendor.perf.qape.boost_duration", "10").value, PROPERTY_VALUE_MAX);
+    return atoi(property);
+}
+
+int getMaxPipelineNumber() {
+    char property[PROPERTY_VALUE_MAX];
+    strlcpy(property, perf_get_property("ro.vendor.perf.qape.max_pipeline_number", "3").value, PROPERTY_VALUE_MAX);
+    return atoi(property);
+}
+
+bool enableAdpfDebug() {
+    char property[PROPERTY_VALUE_MAX];
+    strlcpy(property, perf_get_property("vendor.debug.enable.adpf", "0").value, PROPERTY_VALUE_MAX);
+    return atoi(property) == 1;
+}
+
+bool initTopAppInfo(std::string &topAppName) {
+    const char* tmp = send_perf_sync_request(VENDOR_FEEDBACK_TOPAPP_NAME);
+    if(!tmp) {
+        return false;
     }
-    dlclose(perfClientLibHandle);
+    topAppName = tmp;
+    free((char*)tmp);
+
+    if(send_perf_hint(VENDOR_HINT_PICARD_TOP_APP, topAppName.c_str(), 0, 0) == -1) {
+        return false;
+    }
+    return send_perf_get_feedback(VENDOR_FEEDBACK_WORKLOAD_TYPE, topAppName.c_str()) == GAME_WORKLOAD_TYPE;
 }
 
 PowerHintSessionImpl::PowerHintSessionImpl(int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos){
     mUid = uid;
     mTgid = tgid;
-    mHandle = -1;
-    mBoostSum = 0;
-    mLastAction = -1;
-
     mThreadIds = threadIds;
-    mMaxPipelineThreads = atoi(DEFAULT_MAX_PIPELINE_NUM);
+
+    mEnableDebug = enableAdpfDebug();
+    mEnableAdpf = initTopAppInfo(mTopAppName);
+    mMaxBoostCount = getMaxBoostCount();
+    mBoostDurationSec = getMaxBoostDuration();
+    mMaxGraphicsPipelineThreads = getMaxPipelineNumber();
     mNumGraphicsPipelineThreads = 0;
     mNumPowerEfficiencyThreads = 0;
-    mPowerEfficiencyMode = false;
     mGraphicsPipelineMode = false;
-    mDebug = false;
-    getPerfProperties(); // mMaxPipelineThread, mDebug
+    mPowerEfficiencyMode = false;
 
     mTargetWorkDurationNanos = -1;
     mThresholdNanos = -1;
     mConsecutiveDownCount = 0;
     mTLBHandle = -1;
     mTLBoostSum = 0;
-    mIsTopAppGame = false;
-    updateTargetWorkDuration(durationNanos); // mTargetWorkDurationNanos, mThresholdNanos
+    updateTargetWorkDuration(durationNanos);
     setSessionActivity(this, true);
 }
 
@@ -255,8 +221,8 @@ void PowerHintSessionImpl::releaseThreadPipeline() {
     for(int i = 0; i < mNumGraphicsPipelineThreads; i++) {
         if(mThreadIds[i] == 0)
             continue;
-        // TODO: Relegate(EngineHints::EH_LOW_LAT, mTopAppName, mThreadIds[i], 0);
-        if(mDebug) LOG(INFO) << "Released thread pipeline hint for thread " << mThreadIds[i];
+
+        send_perf_hint(VENDOR_HINT_PICARD_LOW_LAT, mTopAppName.c_str(), mThreadIds[i], 0);
     }
     mNumGraphicsPipelineThreads = 0;
 }
@@ -266,20 +232,20 @@ void PowerHintSessionImpl::releaseLowCpuUtil() {
         if(mThreadIds[i] == 0)
             continue;
 
-        // TODO: Relegate(EngineHints::EH_HIGH_CPUUTIL, mTopAppName, mThreadIds[i], 0);
-        if(mDebug) LOG(INFO) << "Released low cpu util hint for thread " << mThreadIds[i];
+        send_perf_hint(VENDOR_HINT_PICARD_HIGH_CPUUTIL, mTopAppName.c_str(), mThreadIds[i], 0);
     }
     mNumPowerEfficiencyThreads = 0;
 }
 
 void PowerHintSessionImpl::hintThreadPipeline() {
     int count = 0;
-    for(auto it = mThreadIds.begin(); it != mThreadIds.end() && count < mMaxPipelineThreads; it++) {
+    for(auto it = mThreadIds.begin(); it != mThreadIds.end() && count < mMaxGraphicsPipelineThreads; it++) {
         if(*it == 0)
             continue;
 
-        // TODO: Relegate(EngineHints::EH_LOW_LAT, mTopAppName, *it, 2);
-        if(mDebug) LOG(INFO) << "Put thread " << *it << " into pipeline";
+        if(send_perf_hint(VENDOR_HINT_PICARD_LOW_LAT, mTopAppName.c_str(), *it, 2) == -1)
+            break;
+
         ++count;
     }
     mNumGraphicsPipelineThreads = count;
@@ -291,45 +257,30 @@ void PowerHintSessionImpl::hintLowCpuUtil() {
         if(*it == 0)
             continue;
 
-        // TODO: Relegate(EngineHints::EH_HIGH_CPUUTIL, mTopAppName, *it, 2);
-        if(mDebug) LOG(INFO) << "Set thread " << *it << " to prefer power efficiency";
+        if(send_perf_hint(VENDOR_HINT_PICARD_HIGH_CPUUTIL, mTopAppName.c_str(), *it, 2) == -1)
+            break;
+
         ++count;
     }
     mNumPowerEfficiencyThreads = count;
 }
 
-double PowerHintSessionImpl::nextSupportedFPS(double fps) {
-    const std::vector<double> supportedFPS = {30.0, 60.0, 90.0, 120.0, 144.0};
-    auto it = std::lower_bound(supportedFPS.begin(), supportedFPS.end(), fps);
-    if (it == supportedFPS.end()) {
-        it = supportedFPS.end()-1;
-    }
-    if(mDebug) LOG(INFO) << "Supported FPS: " << *it << " for requested FPS: " << fps;
-    return *it;
-}
-
 ndk::ScopedAStatus PowerHintSessionImpl::updateTargetWorkDuration(int64_t in_targetDurationNanos){
-    // TODO: top app is game check
     LOG(INFO) << "PowerHintSessionImpl::updateTargetWorkDuration: " << in_targetDurationNanos;
-    if(in_targetDurationNanos <= 0) {
-        LOG(ERROR) << "Invalid target work duration";
-        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+    if(!mEnableAdpf || in_targetDurationNanos <= 0) {
+        return ndk::ScopedAStatus::ok();
     }
     mTargetWorkDurationNanos = in_targetDurationNanos;
     mThresholdNanos = mTargetWorkDurationNanos - (mTargetWorkDurationNanos/8);
-    double durationInSeconds = static_cast<double>(mTargetWorkDurationNanos)/1'000'000'000.0;
-    double calculatedFps = 1.0/durationInSeconds;
-    double supportedFps = nextSupportedFPS(calculatedFps);
-    // TODO: Relegate(EngineHints::EH_RENDER_RATE, mTopAppName, supportedFps, 1);
-    // TODO: TFPS
+    // double durationInSeconds = static_cast<double>(mTargetWorkDurationNanos)/1'000'000'000.0;
+    // int targetFps = static_cast<int>(100.0 / durationInSeconds);
+    // send_perf_hint(VENDOR_HINT_PICARD_RENDER_RATE, mTopAppName.c_str(), targetFps, 0);
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus PowerHintSessionImpl::reportActualWorkDuration(const std::vector<::aidl::android::hardware::power::WorkDuration>& in_durations){
-    // TODO: top app is game check
-    LOG(INFO) << "PowerHintSessionImpl::reportActualWorkDuration: ";
-    int64_t targetWorkDurationNanos = mTargetWorkDurationNanos;
-    if(targetWorkDurationNanos == -1 || in_durations.empty()) {
+    if(!mEnableAdpf || mTargetWorkDurationNanos == -1 || in_durations.empty()) {
+        if(mEnableDebug) LOG(INFO) << "PowerHintSessionImpl::reportActualWorkDuration:";
         return ndk::ScopedAStatus::ok();
     }
     int64_t actualWorkDurationNanos = in_durations[0].durationNanos;
@@ -338,21 +289,18 @@ ndk::ScopedAStatus PowerHintSessionImpl::reportActualWorkDuration(const std::vec
             actualWorkDurationNanos = duration.durationNanos;
         }
     }
-    if(mDebug) LOG(INFO) << "actual = " << actualWorkDurationNanos << " ns, target = " << targetWorkDurationNanos << " ns, last_boost = " << mTLBoostSum;
+    if(mEnableDebug) LOG(INFO) << "PowerHintSessionImpl::reportActualWorkDuration: actual = " << actualWorkDurationNanos << " ns, target = " << mTargetWorkDurationNanos << " ns";
     if(actualWorkDurationNanos >= mThresholdNanos) {
-        taskLoadBoost(LOAD_UP);
+        sendHint(aidl::android::hardware::power::SessionHint::CPU_LOAD_UP);
         mConsecutiveDownCount = 0;
-    }
-    else {
-        if(mConsecutiveDownCount < 3) {
-            mConsecutiveDownCount++;
-        }
-        if(mConsecutiveDownCount >= 3) {
-            taskLoadBoost(LOAD_DOWN);
+    } else {
+        if(++mConsecutiveDownCount >= 3) {
+            sendHint(aidl::android::hardware::power::SessionHint::CPU_LOAD_DOWN);
         }
     }
     return ndk::ScopedAStatus::ok();
 }
+
 ndk::ScopedAStatus PowerHintSessionImpl::pause(){
     LOG(INFO) << "PowerHintSessionImpl::pause ";
     if(isSessionAlive(this)) {
@@ -361,19 +309,19 @@ ndk::ScopedAStatus PowerHintSessionImpl::pause(){
     }
     return ndk::ScopedAStatus::ok();
 }
+
 ndk::ScopedAStatus PowerHintSessionImpl::resume(){
     LOG(INFO) << "PowerHintSessionImpl::resume ";
     if(isSessionAlive(this)) {
-        sendHint(aidl::android::hardware::power::SessionHint::CPU_LOAD_RESUME);
         setSessionActivity(this, true);
     }
     return ndk::ScopedAStatus::ok();
 }
+
 ndk::ScopedAStatus PowerHintSessionImpl::close(){
     LOG(INFO) << "PowerHintSessionImpl::close ";
     if(isSessionAlive(this)) {
         sendHint(aidl::android::hardware::power::SessionHint::CPU_LOAD_RESET);
-        taskLoadBoost(LOAD_RESET);
         releaseLowCpuUtil();
         releaseThreadPipeline();
         mThreadIds.clear();
@@ -384,74 +332,129 @@ ndk::ScopedAStatus PowerHintSessionImpl::close(){
     }
     return ndk::ScopedAStatus::ok();
 }
+
+bool isBoostEligible() {
+    std::lock_guard<std::mutex> lock(mBoostLock);
+    struct timeval boostCurTv;
+    gettimeofday(&boostCurTv, NULL);
+
+    if(mBoostCount == 0) {
+        mBoostStartTv = boostCurTv;
+        mBoostCount++;
+        return true;
+    } else {
+        double elapsedTimeMillis = 0.0;
+        elapsedTimeMillis = (boostCurTv.tv_sec - mBoostStartTv.tv_sec) * 1000.0;
+        elapsedTimeMillis += (boostCurTv.tv_usec - mBoostStartTv.tv_usec) / 1000.0;
+
+        if(elapsedTimeMillis > (mBoostDurationSec * 1000)) {
+            mBoostCount = 1;
+            mBoostStartTv = boostCurTv;
+            return true;
+        } else {
+            if(mBoostCount >= mMaxBoostCount) {
+                return false;
+            }
+            else {
+                mBoostCount++;
+                return true;
+            }
+        }
+    }
+}
+
+void PowerHintSessionImpl::boostCpu() {
+    if(!isBoostEligible()) {
+        LOG(ERROR) << "Boost too frequent";
+        return;
+    }
+    send_perf_hint(VENDOR_HINT_PICARD_LOAD_CHANGED, mTopAppName.c_str(), CPU_BOOST_PCT, 0);
+}
+
+void PowerHintSessionImpl::boostGpu() {
+    if(!isBoostEligible()) {
+        LOG(ERROR) << "Boost too frequent";
+        return;
+    }
+    send_perf_hint(VENDOR_HINT_PICARD_LOAD_CHANGED, mTopAppName.c_str(), GPU_BOOST_PCT + 100, 1);
+}
+
 ndk::ScopedAStatus PowerHintSessionImpl::sendHint(aidl::android::hardware::power::SessionHint hint){
-    LOG(INFO) << "PowerHintSessionImpl::sendHint ";
+    if(mEnableDebug) LOG(INFO) << "PowerHintSessionImpl::sendHint: " << static_cast<int32_t>(hint);
+    if(!mEnableAdpf) {
+        return ndk::ScopedAStatus::ok();
+    }
     if(!isSessionActive(this))
-        return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_STATE);
-    switch(hint)
-    {
+        return ndk::ScopedAStatus::ok();
+
+    switch(hint) {
         case aidl::android::hardware::power::SessionHint::CPU_LOAD_UP:
-            perfBoost(20, LOAD_UP);
+            taskLoadBoost(LOAD_UP);
             break;
         case aidl::android::hardware::power::SessionHint::CPU_LOAD_DOWN:
-            perfBoost(-20, LOAD_DOWN);
+            taskLoadBoost(LOAD_DOWN);
             break;
         case aidl::android::hardware::power::SessionHint::CPU_LOAD_RESET:
-            perfBoost(0, LOAD_RESET);
-            break;
+            mConsecutiveDownCount = 0;
+            [[ fallthrough ]];
         case aidl::android::hardware::power::SessionHint::CPU_LOAD_RESUME:
-            perfBoost(0, LOAD_RESUME);
+            taskLoadBoost(LOAD_RESET);
             break;
         case aidl::android::hardware::power::SessionHint::POWER_EFFICIENCY:
-            perfBoost(-20, LOAD_DOWN);
+        case aidl::android::hardware::power::SessionHint::GPU_LOAD_UP:
+        case aidl::android::hardware::power::SessionHint::GPU_LOAD_DOWN:
+        case aidl::android::hardware::power::SessionHint::GPU_LOAD_RESET:
+            break;
+        case aidl::android::hardware::power::SessionHint::CPU_LOAD_SPIKE:
+            boostCpu();
+            break;
+        case aidl::android::hardware::power::SessionHint::GPU_LOAD_SPIKE:
+            boostGpu();
             break;
         default:
             break;
     }
     return ndk::ScopedAStatus::ok();
 }
+
 ndk::ScopedAStatus PowerHintSessionImpl::setThreads(const std::vector<int32_t>& threadIds){
-    LOG(INFO) << "PowerHintSessionImpl::setThreads " << printThreads(threadIds, static_cast<int>(threadIds.size()));
-    if (threadIds.size() == 0) {
+    LOG(INFO) << "PowerHintSessionImpl::setThreads: " << printThreads(threadIds, static_cast<int>(threadIds.size()));
+    if (threadIds.empty()) {
         LOG(ERROR) << "Threads list is empty";
         return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
     }
+    sendHint(aidl::android::hardware::power::SessionHint::CPU_LOAD_RESET);
+    releaseLowCpuUtil();
+    releaseThreadPipeline();
+    mPowerEfficiencyMode = false;
+    mGraphicsPipelineMode = false;
     mThreadIds = threadIds;
-
-    // reset task load boost
-    mConsecutiveDownCount = 0;
-    taskLoadBoost(LOAD_RESET);
-
-    // reset session hint
-    if(mPowerEfficiencyMode) setMode(aidl::android::hardware::power::SessionMode::POWER_EFFICIENCY, mPowerEfficiencyMode);
-    if(mGraphicsPipelineMode) setMode(aidl::android::hardware::power::SessionMode::GRAPHICS_PIPELINE, mGraphicsPipelineMode);
     return ndk::ScopedAStatus::ok();
 }
 
 ndk::ScopedAStatus PowerHintSessionImpl::setMode(aidl::android::hardware::power::SessionMode mode, bool enabled) {
-    // TODO: top app is game check
+    LOG(INFO) << "PowerHintSessionImpl::setMode: mode = " << static_cast<int>(mode) << ", enabled = " << enabled;
+    if(!mEnableAdpf) {
+        return ndk::ScopedAStatus::ok();
+    }
+
     switch(mode) {
         case aidl::android::hardware::power::SessionMode::POWER_EFFICIENCY:
-            LOG(INFO) << "PowerHintSessionImpl::setMode: mode = POWER_EFFICIENCY, enabled = " << enabled;
             releaseLowCpuUtil();
             if(enabled) {
                 hintLowCpuUtil();
             }
             mPowerEfficiencyMode = enabled;
-            return ndk::ScopedAStatus::ok();
-
+            break;
         case aidl::android::hardware::power::SessionMode::GRAPHICS_PIPELINE:
-            LOG(INFO) << "PowerHintSessionImpl::setMode: mode = GRAPHICS_PIPELINE, enabled = " << enabled;
             releaseThreadPipeline();
             if(enabled) {
                 hintThreadPipeline();
             }
             mGraphicsPipelineMode = enabled;
-            return ndk::ScopedAStatus::ok();
-
+            break;
         default:
-            LOG(ERROR) << "PowerHintSessionImpl::setMode: Unsupported mode = " << static_cast<int>(mode);
-            return ndk::ScopedAStatus::fromExceptionCode(EX_ILLEGAL_ARGUMENT);
+            break;
     }
 	return ndk::ScopedAStatus::ok();
 }

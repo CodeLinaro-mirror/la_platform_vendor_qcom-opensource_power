@@ -38,38 +38,31 @@ public:
     ndk::ScopedAStatus setThreads(const std::vector<int32_t>& threadIds) override;
     ndk::ScopedAStatus setMode(aidl::android::hardware::power::SessionMode mode, bool enabled) override;
     ndk::ScopedAStatus getSessionConfig(aidl::android::hardware::power::SessionConfig* _aidl_return) override;
-    double nextSupportedFPS(double fps);
-    bool perfBoost(int boostVal, int hintType);
     bool taskLoadBoost(int loadType);
-    void getPerfProperties();
     void hintThreadPipeline();
     void hintLowCpuUtil();
     void releaseThreadPipeline();
     void releaseLowCpuUtil();
-    void resetBoost();
+    void boostCpu();
+    void boostGpu();
 private:
     int32_t mUid;
     int32_t mTgid;
-    int mHandle;
-    int mBoostSum;
-    int mLastAction;
-
     std::vector<int32_t> mThreadIds;
-    int32_t mMaxPipelineThreads;
+
+    bool mEnableDebug;
+    bool mEnableAdpf;
+    std::string mTopAppName;
+    int mMaxGraphicsPipelineThreads;
     int mNumGraphicsPipelineThreads;
     int mNumPowerEfficiencyThreads;
-    bool mPowerEfficiencyMode;
     bool mGraphicsPipelineMode;
-    bool mDebug; // <Prop Name="vendor.debug.enable.adpf" Value="1">
+    bool mPowerEfficiencyMode;
 
     int64_t mTargetWorkDurationNanos;
     int64_t mThresholdNanos;
-    int mConsecutiveDownCount;
+    unsigned int mConsecutiveDownCount;
     int mTLBHandle;
     int mTLBoostSum;
-
-    // TODO: get info from Qape and WLC
-    std::string mTopAppName;
-    bool mIsTopAppGame;
 };
 #endif /* __POWERHINTSESSION__ */
