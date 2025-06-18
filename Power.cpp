@@ -214,7 +214,7 @@
          int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
          SessionTag tag, SessionConfig* config, std::shared_ptr<IPowerHintSession>* _aidl_return)
  {
-     if (tag == SessionTag::OTHER || tag == SessionTag::SURFACEFLINGER || tag == SessionTag::HWUI || tag == SessionTag::GAME) {
+     if (tag != SessionTag::OTHER && tag != SessionTag::SURFACEFLINGER && tag != SessionTag::HWUI && tag != SessionTag::GAME) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
      }
      auto out = createHintSession(tgid, uid, threadIds, durationNanos, _aidl_return);
