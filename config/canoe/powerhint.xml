@@ -339,14 +339,14 @@
         <!-- camera close tunings-->
         <!-- MPCTLV3_ALL_CPUS_PWR_CLPS_DIS, 0x1 -->
         <!-- MPCTLV3_SCHED_BOOST, 0x5 -->
-        <!-- MPCTLV3_WALT_ADAPTIVE_HIGH_FREQ_BIG resource opcode, 1632000 -->
+        <!-- MPCTLV3_WALT_ADAPTIVE_HIGH_FREQ_BIG resource opcode, 1555200 -->
         <!-- MPCTLV3_WALT_ADAPTIVE_HIGH_FREQ_PRIME resource opcode, 2169600 -->
-        <!-- MPCTLV3_WALT_ADAPTIVE_LOW_FREQ_BIG resource opcode, 1324800 -->
-        <!-- MPCTLV3_WALT_ADAPTIVE_LOW_FREQ_PRIME resource opcode, 1747200 -->
+        <!-- MPCTLV3_WALT_ADAPTIVE_LOW_FREQ_BIG resource opcode, 998400 -->
+        <!-- MPCTLV3_WALT_ADAPTIVE_LOW_FREQ_PRIME resource opcode, 1632000 -->
         <Config
             Id="0x00001338" Enable="true" Timeout="1000" Target="canoe"
-            Resources="0x40400000, 0x1, 0x40C00000, 0x5, 0x4080C000, 1747200, 0x4080C200, 2169600,
-            0x40808000, 1324800, 0x40808200, 1632000"/>
+            Resources="0x40400000, 0x1, 0x40C00000, 0x5, 0x4080C000, 1555200, 0x4080C200, 2169600,
+            0x40808000, 998400, 0x40808200, 1632000"/>
 
         <!-- camera snapshot tunings-->
         <!-- MPCTLV3_ALL_CPUS_PWR_CLPS_DIS, 0x1 -->
