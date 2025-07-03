@@ -201,6 +201,18 @@ ndk::ScopedAStatus Power::getHintSessionPreferredRate(int64_t* outNanoseconds) {
     return ndk::ScopedAStatus::ok();
 }
 
+ndk::ScopedAStatus Power::createHintSessionWithConfig(int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos, aidl::android::hardware::power::SessionTag tag, aidl::android::hardware::power::SessionConfig* config, std::shared_ptr<::aidl::android::hardware::power::IPowerHintSession>* _aidl_return){
+	return ndk::ScopedAStatus::ok();
+}
+
+ndk::ScopedAStatus Power::getSessionChannel(int32_t tgid, int32_t uid, aidl::android::hardware::power::ChannelConfig* _aidl_return){
+	return ndk::ScopedAStatus::ok();
+}
+
+ndk::ScopedAStatus Power::closeSessionChannel(int32_t tgid, int32_t uid){
+	return ndk::ScopedAStatus::ok();
+}
+
 }  // namespace impl
 }  // namespace power
 }  // namespace hardware

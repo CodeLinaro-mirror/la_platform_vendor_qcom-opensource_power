@@ -23,5 +23,7 @@ public:
     ndk::ScopedAStatus close() override;
     ndk::ScopedAStatus sendHint(aidl::android::hardware::power::SessionHint hint) override;
     ndk::ScopedAStatus setThreads(const std::vector<int32_t>& threadIds) override;
+    ndk::ScopedAStatus setMode(aidl::android::hardware::power::SessionMode type, bool enabled) override;
+    ndk::ScopedAStatus getSessionConfig(aidl::android::hardware::power::SessionConfig* _aidl_return) override;
 };
 #endif /* __POWERHINTSESSION__ */
