@@ -159,8 +159,11 @@
  ndk::ScopedAStatus Power::getCpuHeadroom(const CpuHeadroomParams& cpuHeadroomParams, CpuHeadroomResult* cpuHeadroomResult) {
      LOG(INFO) << "Power getCpuHeadroom";
      int durationMillis = cpuHeadroomParams.calculationWindowMillis;
-     if(!cpuHeadroomParams.tids.empty() || durationMillis < CPU_MIN_DURATION_MS || durationMillis > CPU_MAX_DURATION_MS) {
+     if(durationMillis > CPU_MAX_DURATION_MS) {
          return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+     }
+     if(durationMillis < CPU_MIN_DURATION_MS) {
+         durationMillis = CPU_MIN_DURATION_MS;
      }
 
      int args[] = { CPU_HEADROOM_TOTAL, durationMillis / 1000 };
@@ -184,8 +187,11 @@
          return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
      }
      int durationMillis = gpuHeadroomParams.calculationWindowMillis;
-     if(durationMillis < GPU_MIN_DURATION_MS || durationMillis > GPU_MAX_DURATION_MS) {
+     if(durationMillis > GPU_MAX_DURATION_MS) {
          return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+     }
+     if(durationMillis < GPU_MIN_DURATION_MS) {
+         durationMillis = GPU_MIN_DURATION_MS;
      }
 
      int args[] = { calculationType, durationMillis / 1000 };
@@ -214,7 +220,7 @@
          int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos,
          SessionTag tag, SessionConfig* config, std::shared_ptr<IPowerHintSession>* _aidl_return)
  {
-     if (tag == SessionTag::OTHER || tag == SessionTag::SURFACEFLINGER || tag == SessionTag::HWUI || tag == SessionTag::GAME) {
+     if (tag != SessionTag::OTHER && tag != SessionTag::SURFACEFLINGER && tag != SessionTag::HWUI && tag != SessionTag::GAME) {
         return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
      }
      auto out = createHintSession(tgid, uid, threadIds, durationNanos, _aidl_return);
@@ -277,11 +283,11 @@
                                              .isGpuSupported = true,
                                              .cpuMinIntervalMillis = 1000,
                                              .gpuMinIntervalMillis = 1000,
-                                             .cpuMinCalculationWindowMillis = CPU_MIN_DURATION_MS,
+                                             .cpuMinCalculationWindowMillis = 50,
                                              .cpuMaxCalculationWindowMillis = CPU_MAX_DURATION_MS,
-                                             .gpuMinCalculationWindowMillis = GPU_MIN_DURATION_MS,
+                                             .gpuMinCalculationWindowMillis = 50,
                                              .gpuMaxCalculationWindowMillis = GPU_MAX_DURATION_MS,
-                                             .cpuMaxTidCount = 0,
+                                             .cpuMaxTidCount = 5,
                                      }};
      // Copy the support object into the binder
      *_aidl_return = supportInfo;
