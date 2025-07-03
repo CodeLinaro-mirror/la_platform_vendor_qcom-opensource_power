@@ -41,3 +41,9 @@ ndk::ScopedAStatus PowerHintSessionImpl::setThreads(const std::vector<int32_t>& 
     }
     return ndk::ScopedAStatus::ok();
 }
+ndk::ScopedAStatus PowerHintSessionImpl::setMode(aidl::android::hardware::power::SessionMode in_type, bool in_enabled){
+	return ndk::ScopedAStatus::ok();
+}
+ndk::ScopedAStatus PowerHintSessionImpl::getSessionConfig(aidl::android::hardware::power::SessionConfig* _aidl_return){
+	return ndk::ScopedAStatus::ok();
+}
