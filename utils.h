@@ -59,6 +59,7 @@ int perf_hint_enable(int hint_id, int duration);
 int send_perf_hint(int hint_id, const char* pkg, int duration, int type);
 int send_perf_get_feedback(int hint_id, const char* pkg);
 int send_perf_get_feedback_extn(int hint_id, const char* pkg, int numArgs, int list[]);
+int send_perf_event(int event_id, const char* pkg, int numArgs, int list[]);
 const char* send_perf_sync_request(int hint_id);
 PropVal perf_get_property(const char *prop , const char *def_val);
 
