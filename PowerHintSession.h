@@ -49,6 +49,7 @@ private:
     int32_t mUid;
     int32_t mTgid;
     std::vector<int32_t> mThreadIds;
+    std::vector<int32_t> mSupportedFps;
 
     bool mEnableDebug;
     bool mEnableAdpf;
