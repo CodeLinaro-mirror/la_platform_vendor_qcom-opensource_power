@@ -35,6 +35,30 @@
 -->
 <HintConfigs>
     <Powerhint>
+	    <!-- video decode 60 fps non secure content tunings -  Applicable for decoder if FPS range is (35 to 65) and is non secure-->
+        <!-- GPU - min pwrlevel 9 (freq 222 Mhz) -->
+        <!-- GPU - max pwrlevel 0 (freq 967 Mhz) -->
+        <Config
+            Id="0X00001506" Enable="true" Timeout="0" Target="seraph"
+            Resources="0x42804000, 0x9, 0x42808000, 0x0"/>
+		<!-- video decode 30 fps non secure content tunings-->
+        <!-- GPU - min pwrlevel 9 (freq 222 Mhz) -->
+        <!-- GPU - max pwrlevel 0 (freq 967 Mhz) -->
+        <Config
+            Id="0X00001503" Enable="true" Timeout="0" Target="seraph"
+            Resources="0x42804000, 0x9, 0x42808000, 0x0"/>
+		<!-- video decode 60 fps non secure content tunings /* Applicable for decoder if FPS range is (1 to 34) and is non secure-->
+        <!-- GPU - min pwrlevel 9 (freq 222 Mhz) -->
+        <!-- GPU - max pwrlevel 0 (freq 967 Mhz) -->
+		<Config
+            Id="0X00001502" Enable="true" Timeout="0" Target="seraph"
+            Resources="0x42804000, 0x9, 0x42808000, 0x0"/>
+		<!-- video decode 60 fps non secure content tunings - Applicable for decoder if FPS range is (1 to 34) and is secure -->
+        <!-- GPU - min pwrlevel 9 (freq 222 Mhz) -->
+        <!-- GPU - max pwrlevel 0 (freq 967 Mhz) -->
+		<Config
+            Id="0X00001504" Enable="true" Timeout="0" Target="seraph"
+            Resources="0x42804000, 0x9, 0x42808000, 0x0"/>
         <!--camera ZSLPreview-->
         <!--CPU-LLC BWMON - Set sample_ms 33-->
         <!--CPU-LLC BWMON - Set io_percent 100 -->
