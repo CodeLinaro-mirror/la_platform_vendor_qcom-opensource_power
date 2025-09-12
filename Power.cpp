@@ -37,10 +37,11 @@
 #include "PowerHintSession.h"
 
 #include <android-base/logging.h>
+#include <fmq/AidlMessageQueue.h>
+#include <fmq/EventFlag.h>
+#include <thread>
 
 #include <aidl/android/hardware/power/BnPower.h>
-
-#include <android-base/logging.h>
 #include <android/binder_manager.h>
 #include <android/binder_process.h>
 #include <fcntl.h>
@@ -52,6 +53,10 @@ using ::aidl::android::hardware::power::BnPower;
 using ::aidl::android::hardware::power::IPower;
 using ::aidl::android::hardware::power::Mode;
 using ::aidl::android::hardware::power::Boost;
+using ::aidl::android::hardware::common::fmq::MQDescriptor;
+using ::aidl::android::hardware::common::fmq::SynchronizedReadWrite;
+using ::aidl::android::hardware::power::ChannelMessage;
+using ::android::AidlMessageQueue;
 
 using ::ndk::ScopedAStatus;
 using ::ndk::SharedRefBase;
@@ -202,10 +207,27 @@ ndk::ScopedAStatus Power::getHintSessionPreferredRate(int64_t* outNanoseconds) {
 }
 
 ndk::ScopedAStatus Power::createHintSessionWithConfig(int32_t tgid, int32_t uid, const std::vector<int32_t>& threadIds, int64_t durationNanos, aidl::android::hardware::power::SessionTag tag, aidl::android::hardware::power::SessionConfig* config, std::shared_ptr<::aidl::android::hardware::power::IPowerHintSession>* _aidl_return){
-	return ndk::ScopedAStatus::ok();
+	if (tag != SessionTag::OTHER && tag != SessionTag::SURFACEFLINGER && tag != SessionTag::HWUI && tag != SessionTag::GAME) {
+        	return ndk::ScopedAStatus::fromExceptionCode(EX_UNSUPPORTED_OPERATION);
+     	}
+	auto out = createHintSession(tgid, uid, threadIds, durationNanos, _aidl_return);
+	static_cast<PowerHintSessionImpl*>(_aidl_return->get())->getSessionConfig(config);
+	return out;
 }
 
 ndk::ScopedAStatus Power::getSessionChannel(int32_t tgid, int32_t uid, aidl::android::hardware::power::ChannelConfig* _aidl_return){
+	static AidlMessageQueue<ChannelMessage, SynchronizedReadWrite> stubQueue{20, true};
+	static std::thread stubThread([&] {
+        	ChannelMessage data;
+        	// This loop will only run while there is data waiting
+        	// to be processed, and blocks on a futex all other times
+        	while (stubQueue.readBlocking(&data, 1, 0)) {
+        	}
+	});
+	_aidl_return->channelDescriptor = stubQueue.dupeDesc();
+	_aidl_return->readFlagBitmask = 0x01;
+	_aidl_return->writeFlagBitmask = 0x02;
+	_aidl_return->eventFlagDescriptor = std::nullopt;
 	return ndk::ScopedAStatus::ok();
 }
 
