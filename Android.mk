@@ -14,6 +14,7 @@ LOCAL_C_INCLUDES := external/libxml2/include \
 
 ifeq ($(TARGET_SUPPORTS_WEAR_OS), true)
 LOCAL_CFLAGS += -DENABLE_POWER_HINT_FOR_WEAR
+LOCAL_CFLAGS += -DINTERACTION_BOOST
 endif
 
 ifeq ($(call is-board-platform-in-list,msm8937), true)

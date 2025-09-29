@@ -98,10 +98,12 @@ extern "C" void interaction(int duration, int num_args, int opt_list[]);
 
 ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
     LOG(INFO) << "Power setMode: " << static_cast<int32_t>(type) << " to: " << enabled;
+    int16_t soc_id;
+    static int mode_handle = 20;
+    soc_id =  read_soc_id();
     switch(type){
         case Mode::DOUBLE_TAP_TO_WAKE:
         case Mode::LOW_POWER:
-        case Mode::LAUNCH:
         case Mode::EXPENSIVE_RENDERING:
         case Mode::DEVICE_IDLE:
         case Mode::DISPLAY_INACTIVE:
@@ -112,6 +114,16 @@ ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
         case Mode::CAMERA_STREAMING_HIGH:
         case Mode::VR:
             LOG(INFO) << "Mode " << static_cast<int32_t>(type) << "Not Supported";
+            break;
+        case Mode::LAUNCH:
+                if(soc_id == 669 || soc_id == 670) {
+                    if(enabled) {
+                        int resources[] = {0x40800000, 0xFFF, 0x40800200, 0xFFF, 0x41000000, 0x4, 0x40CA4000, 0x2,
+                                            0x40C00000, 0x1, 0x42804000, 0x0};
+                        int duration = 1000;
+                        interaction_with_handle(mode_handle, duration, sizeof(resources)/sizeof(resources[0]), resources);
+                    }
+                }
             break;
         case Mode::INTERACTIVE:
             setInteractive(enabled);
@@ -135,6 +147,7 @@ ndk::ScopedAStatus Power::isModeSupported(Mode type, bool* _aidl_return) {
         case Mode::INTERACTIVE:
         case Mode::SUSTAINED_PERFORMANCE:
         case Mode::FIXED_PERFORMANCE:
+        case Mode::LAUNCH:
             *_aidl_return = true;
             break;
         default:
@@ -148,6 +161,7 @@ ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
 #ifdef ENABLE_POWER_HINT_FOR_WEAR
     int16_t soc_id;
     soc_id =  read_soc_id();
+    static int interaction_handle = 10;
 #endif
     LOG(INFO) << "Power setBoost: " << static_cast<int32_t>(type)
                  << ", duration: " << durationMs;
@@ -159,12 +173,23 @@ ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
             int duration = 50;
             interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
         }
+        else if (soc_id == 669 || soc_id == 670) {
+            int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2};
+            if(durationMs>0)
+                interaction(durationMs, sizeof(resources)/sizeof(resources[0]), resources);
+        }
     }
     else if(type == Boost::INTERACTION) {
         if (soc_id == 486 || soc_id == 517) {
             int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2};
             int duration = 500;
             interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
+        }
+        else if (soc_id == 669 || soc_id == 670) {
+            if(durationMs > 0) {
+                int resources[] = {0x40800000, 0x514, 0x41000000, 0x2, 0x40CA4000, 0x2};
+                interaction(durationMs, sizeof(resources)/sizeof(resources[0]), resources);
+            }
         }
     }
 #endif
@@ -177,7 +202,7 @@ ndk::ScopedAStatus Power::isBoostSupported(Boost type, bool* _aidl_return) {
     if ((type == Boost::DISPLAY_UPDATE_IMMINENT) || (type == Boost::INTERACTION)) {
         int16_t soc_id;
         soc_id =  read_soc_id();
-        if (soc_id == 486 || soc_id == 517) {
+        if (soc_id == 486 || soc_id == 517 || soc_id == 669 || soc_id == 670) {
             *_aidl_return = true;
         }
     } else {
