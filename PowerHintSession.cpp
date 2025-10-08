@@ -303,19 +303,7 @@ ndk::ScopedAStatus PowerHintSessionImpl::updateTargetWorkDuration(int64_t in_tar
     }
     mTargetWorkDurationNanos = in_targetDurationNanos;
     mThresholdNanos = mTargetWorkDurationNanos - (mTargetWorkDurationNanos/8);
-    double durationInSeconds = static_cast<double>(mTargetWorkDurationNanos)/1000000000.0;
-    int fps = static_cast<int>(1.0/durationInSeconds);
-
-    if(mSupportedFps.empty()) {
-        return ndk::ScopedAStatus::ok();
-    }
-    auto it = std::lower_bound(mSupportedFps.begin(), mSupportedFps.end(), fps);
-    if (it == mSupportedFps.end()) {
-        it = mSupportedFps.end()-1;
-    }
-    int targetFps = *it;
-    int args[] = { targetFps * 100, 0 }; // {hintType, duration}
-    send_perf_event(VENDOR_HINT_PICARD_RENDER_RATE, mTopAppName.c_str(), 2, args);
+    LOG(INFO) << "Hint to TFPS disabled";
     return ndk::ScopedAStatus::ok();
 }
 
