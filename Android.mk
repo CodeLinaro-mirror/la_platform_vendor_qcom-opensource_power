@@ -9,14 +9,23 @@ include $(CLEAR_VARS)
 LOCAL_MODULE_RELATIVE_PATH := hw
 LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils libbinder_ndk
 
-ifneq ( ,$(filter T 13 ,$(PLATFORM_VERSION)))
-     LOCAL_SHARED_LIBRARIES += android.hardware.power-V2-ndk
-     LOCAL_VINTF_FRAGMENTS := power-v2.xml
-     LOCAL_CFLAGS += -DENABLE_POWER_AIDL_V2_APIS
-else ifneq( ,$(filter U 14 ,$(PLATFORM_VERSION)))
+ifneq (,$(filter T 13,$(PLATFORM_VERSION)))
+    LOCAL_SHARED_LIBRARIES += android.hardware.power-V2-ndk
+    LOCAL_VINTF_FRAGMENTS := power-v2.xml
+    LOCAL_CFLAGS += -DENABLE_POWER_AIDL_V2_APIS
+else ifneq (,$(filter U 14,$(PLATFORM_VERSION)))
     LOCAL_SHARED_LIBRARIES += android.hardware.power-V4-ndk
     LOCAL_VINTF_FRAGMENTS := power-v4.xml
     LOCAL_SRC_FILES := PowerHintSession.cpp
+
+else ifneq (,$(filter W 16,$(PLATFORM_VERSION)))
+    LOCAL_SHARED_LIBRARIES += android.hardware.power-V6-ndk \
+                              libcutils \
+                              libfmq \
+                              libutils
+    LOCAL_VINTF_FRAGMENTS := power-v6.xml
+    LOCAL_SRC_FILES := PowerHintSession.cpp
+    LOCAL_CFLAGS += -DENABLE_POWER_AIDL_V6_APIS
 endif
 
 
@@ -99,9 +108,6 @@ LOCAL_MODULE := android.hardware.power-service
 LOCAL_INIT_RC := android.hardware.power-service.rc
 LOCAL_MODULE_TAGS := optional
 LOCAL_CFLAGS += -Wno-unused-parameter -Wno-unused-variable
-ifneq ( ,$(filter W 16 Baklava ,$(PLATFORM_VERSION)))
-LOCAL_VINTF_FRAGMENTS := power.xml
-endif
 LOCAL_VENDOR_MODULE := true
 include $(BUILD_EXECUTABLE)
 endif
