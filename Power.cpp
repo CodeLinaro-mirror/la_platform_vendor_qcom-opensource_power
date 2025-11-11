@@ -75,7 +75,7 @@ int16_t read_soc_id() {
     static int16_t soc_id = -1;
     if(soc_id == -1) {
 
-        int8_t fd;
+        int8_t fd = -1;
         if (!access("/sys/devices/soc0/soc_id", F_OK)) {
             fd = open("/sys/devices/soc0/soc_id", O_RDONLY);
         } else if (!access("/sys/devices/system/soc0/soc_id", F_OK)) {
@@ -98,41 +98,33 @@ extern "C" void interaction(int duration, int num_args, int opt_list[]);
 
 ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
     LOG(INFO) << "Power setMode: " << static_cast<int32_t>(type) << " to: " << enabled;
-    int16_t soc_id;
-    static int mode_handle = 20;
-    soc_id =  read_soc_id();
+    int state = enabled ? 1 : 0;
+
     switch(type){
-        case Mode::DOUBLE_TAP_TO_WAKE:
         case Mode::LOW_POWER:
-        case Mode::EXPENSIVE_RENDERING:
         case Mode::DEVICE_IDLE:
+            power_hint(POWER_HINT_LOW_POWER, (void*)&state);
+            break;
+        case Mode::LAUNCH:
+            power_hint(POWER_HINT_LAUNCH, (void*)&state);
+            break;
+        case Mode::INTERACTIVE:
+            setInteractive(enabled);
+            power_hint(POWER_HINT_INTERACTION, (void*)&state);
+            break;
+        case Mode::SUSTAINED_PERFORMANCE:
+        case Mode::FIXED_PERFORMANCE:
+            power_hint(POWER_HINT_SUSTAINED_PERFORMANCE, (void*)&state);
+            break;
         case Mode::DISPLAY_INACTIVE:
+        case Mode::DOUBLE_TAP_TO_WAKE:
+        case Mode::VR:
+        case Mode::EXPENSIVE_RENDERING:
         case Mode::AUDIO_STREAMING_LOW_LATENCY:
         case Mode::CAMERA_STREAMING_SECURE:
         case Mode::CAMERA_STREAMING_LOW:
         case Mode::CAMERA_STREAMING_MID:
         case Mode::CAMERA_STREAMING_HIGH:
-        case Mode::VR:
-            LOG(INFO) << "Mode " << static_cast<int32_t>(type) << "Not Supported";
-            break;
-        case Mode::LAUNCH:
-                if(soc_id == 669 || soc_id == 670) {
-                    if(enabled) {
-                        int resources[] = {0x40800000, 0xFFF, 0x40800200, 0xFFF, 0x41000000, 0x4, 0x40CA4000, 0x2,
-                                            0x40C00000, 0x1, 0x42804000, 0x0};
-                        int duration = 1000;
-                        interaction_with_handle(mode_handle, duration, sizeof(resources)/sizeof(resources[0]), resources);
-                    }
-                }
-            break;
-        case Mode::INTERACTIVE:
-            setInteractive(enabled);
-            power_hint(POWER_HINT_INTERACTION, NULL);
-            break;
-        case Mode::SUSTAINED_PERFORMANCE:
-        case Mode::FIXED_PERFORMANCE:
-            power_hint(POWER_HINT_SUSTAINED_PERFORMANCE, NULL);
-            break;
         default:
             LOG(INFO) << "Mode " << static_cast<int32_t>(type) << "Not Supported";
             break;
@@ -147,7 +139,12 @@ ndk::ScopedAStatus Power::isModeSupported(Mode type, bool* _aidl_return) {
         case Mode::INTERACTIVE:
         case Mode::SUSTAINED_PERFORMANCE:
         case Mode::FIXED_PERFORMANCE:
+#ifdef ENABLE_POWER_HINT_FOR_WEAR
         case Mode::LAUNCH:
+        case Mode::LOW_POWER:
+        case Mode::DEVICE_IDLE:
+        case Mode::DISPLAY_INACTIVE:
+#endif
             *_aidl_return = true;
             break;
         default:
@@ -158,39 +155,19 @@ ndk::ScopedAStatus Power::isModeSupported(Mode type, bool* _aidl_return) {
 }
 
 ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
-#ifdef ENABLE_POWER_HINT_FOR_WEAR
-    int16_t soc_id;
-    soc_id =  read_soc_id();
-    static int interaction_handle = 10;
-#endif
     LOG(INFO) << "Power setBoost: " << static_cast<int32_t>(type)
                  << ", duration: " << durationMs;
 
 #ifdef ENABLE_POWER_HINT_FOR_WEAR
-    if (type == Boost::DISPLAY_UPDATE_IMMINENT) {
-        if (soc_id == 486 || soc_id == 517) {
-            int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2};
-            int duration = 50;
-            interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
-        }
-        else if (soc_id == 669 || soc_id == 670) {
-            int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2};
-            if(durationMs>0)
-                interaction(durationMs, sizeof(resources)/sizeof(resources[0]), resources);
-        }
-    }
-    else if(type == Boost::INTERACTION) {
-        if (soc_id == 486 || soc_id == 517) {
-            int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2};
-            int duration = 500;
-            interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
-        }
-        else if (soc_id == 669 || soc_id == 670) {
-            if(durationMs > 0) {
-                int resources[] = {0x40800000, 0x514, 0x41000000, 0x2, 0x40CA4000, 0x2};
-                interaction(durationMs, sizeof(resources)/sizeof(resources[0]), resources);
+    switch(type) {
+        case Boost::DISPLAY_UPDATE_IMMINENT:
+        case Boost::INTERACTION:
+            if(durationMs > 1) {
+                power_hint(POWER_HINT_INTERACTION, (void*)&durationMs);
             }
-        }
+            break;
+        default:
+            break;
     }
 #endif
     return ndk::ScopedAStatus::ok();
@@ -199,14 +176,14 @@ ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
 ndk::ScopedAStatus Power::isBoostSupported(Boost type, bool* _aidl_return) {
     LOG(INFO) << "Power isBoostSupported: " << static_cast<int32_t>(type);
 #ifdef ENABLE_POWER_HINT_FOR_WEAR
-    if ((type == Boost::DISPLAY_UPDATE_IMMINENT) || (type == Boost::INTERACTION)) {
-        int16_t soc_id;
-        soc_id =  read_soc_id();
-        if (soc_id == 486 || soc_id == 517 || soc_id == 669 || soc_id == 670) {
+    switch(type) {
+        case Boost::DISPLAY_UPDATE_IMMINENT:
+        case Boost::INTERACTION:
             *_aidl_return = true;
-        }
-    } else {
-        *_aidl_return = false;
+            break;
+        default:
+            *_aidl_return = false;
+            break;
     }
 #else
     *_aidl_return = false;

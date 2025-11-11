@@ -57,9 +57,38 @@
 
 #define MAX_RETRY 10
 
+/* Declare function before use */
+void interaction(int duration, int num_args, int opt_list[]);
 
-int power_hint_override(struct power_module *module, power_hint_t hint, void *data)
+int power_hint_override(power_hint_t hint, void *data)
 {
+	int enabled = 0;
+	int duration = 0;
+
+	if (data != NULL)
+		enabled = *(int *)data;
+
+	ALOGI("Hint received, power_hint: %d, enabled: %d", hint, enabled);
+
+	switch(hint) {
+		case POWER_HINT_INTERACTION:
+			if(enabled > 0) {
+				int resources[] = {0x40800000, 0x360, 0x41000000, 0x2, 0x40CA4000, 0x2};
+				duration = enabled;
+				interaction(duration, sizeof(resources)/sizeof(resources[0]), resources);
+			}
+			break;
+		case POWER_HINT_LOW_POWER:
+		case POWER_HINT_LAUNCH:
+		case POWER_HINT_VSYNC:
+		case POWER_HINT_SUSTAINED_PERFORMANCE:
+		case POWER_HINT_VR_MODE:
+		case POWER_HINT_DISABLE_TOUCH:
+		default:
+			ALOGD("Power Hint: %d Not Supported", hint);
+			break;
+	}
+
     return HINT_HANDLED;
 }
 

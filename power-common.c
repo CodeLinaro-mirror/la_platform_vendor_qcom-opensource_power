@@ -117,6 +117,7 @@ int __attribute__ ((weak)) set_interactive_override(int on)
 
 void set_interactive(int on)
 {
+#ifndef ENABLE_POWER_HINT_FOR_WEAR
     if (!on) {
         /* Send Display OFF hint to perf HAL */
         perf_hint_enable(VENDOR_HINT_DISPLAY_OFF, 0);
@@ -124,6 +125,7 @@ void set_interactive(int on)
         /* Send Display ON hint to perf HAL */
         perf_hint_enable(VENDOR_HINT_DISPLAY_ON, 0);
     }
+#endif
 
     if (set_interactive_override(on) == HINT_HANDLED) {
         return;
