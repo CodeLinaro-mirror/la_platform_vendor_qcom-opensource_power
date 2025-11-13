@@ -210,7 +210,7 @@
         <!-- MPCTLV3_CPU_LLCC_BW_AB_SCALE  50  -->
         <!-- MPCTLV3_SCALING_MIN_FREQ_BIG  691  -->
         <Config
-            Id="0x00001330" Enable="true" Timeout="0" Target="canoe"
+            Id="0x00001330" Enable="true" Timeout="0" Target="canoe,whale"
             Resources="0x4183C000, 0x21, 0x41834000, 0xC8, 0x41838000, 0,  0x4185C000, 0x21, 0x41854000, 0xC8, 0x41858000, 0,
             0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x41000000, 3, 0x4100C000, 0x7, 0x43034000, 0x21, 0x43020000, 0xC8,
             0x43048000, 0x32, 0x43024000, 0, 0x41874000, 0x32, 0x41878000, 0x32, 0x40810000, 691"/>
@@ -237,7 +237,7 @@
         <!-- MPCTLV3_CPU_LLCC_BW_AB_SCALE  50  -->
         <!-- MPCTLV3_SCALING_MIN_FREQ_BIG  691MHz -->
         <Config
-            Id="0x00001331" Enable="true" Timeout="0" Target="canoe"
+            Id="0x00001331" Enable="true" Timeout="0" Target="canoe,whale"
             Resources="0x4183C000, 0x21, 0x41834000, 0xC8, 0x41838000, 0, 0x4185C000, 0x21, 0x41854000, 0xC8, 0x41858000, 0,
             0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x4143C000, 0x2B3, 0x41000000, 3, 0x4100C000, 0x7,
             0x43034000, 0x21, 0x43020000, 0xC8, 0x43048000, 0x32, 0x43024000, 0, 0x41874000, 0x32, 0x41878000, 0x32,
@@ -266,7 +266,7 @@
         <!-- MPCTLV3_SCALING_MIN_FREQ_BIG  691MHz -->
         <!-- MPCTLV3_SCHED_LOAD_BOOST  -10  -->
         <Config
-            Id="0x00001332" Enable="true" Timeout="0" Target="canoe"
+            Id="0x00001332" Enable="true" Timeout="0" Target="canoe,whale"
             Resources="0x4183C000, 0x10, 0x41834000, 0xC8, 0x41838000, 0, 0x4185C000, 0x10, 0x41854000, 0xC8, 0x41858000, 0,
             0x4303C000, 0x14A528, 0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x4143C000, 0x2B3,
             0x43034000, 0x10, 0x43020000, 0xC8, 0x43048000, 0x32, 0x43024000, 0, 0x41874000, 0x32, 0x41878000, 0x32,
@@ -288,7 +288,7 @@
         <!-- MPCTLV3_MIN_ONLINE_CPU_CLUSTER_BIG  6 -->
         <!-- MPCTLV3_CORE_CTL_CPU_NOT_PREFERRED_BIG  000000 -->
         <Config
-            Id="0x00001340" Enable="true" Timeout="0" Target="canoe"
+            Id="0x00001340" Enable="true" Timeout="0" Target="canoe,whale"
             Resources="0x4183C000, 0x10, 0x41834000, 0xB4, 0x41838000, 0, 0x4185C000, 0x10, 0x41854000, 0xB4, 0x41858000, 0,
             0x4303C000, 0x14A528, 0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x40800000, 0x480,
             0x41000000, 6, 0x4100C000, 0x0"/>
@@ -314,7 +314,7 @@
         <!-- MPCTLV3_CPU_LLCC_BW_AB_SCALE  50  -->
         <!-- MPCTLV3_SCALING_MIN_FREQ_BIG  691MHz -->
         <Config
-            Id="0x00001333" Enable="true" Timeout="0" Target="canoe"
+            Id="0x00001333" Enable="true" Timeout="0" Target="canoe,whale"
             Resources="0x4183C000, 0x10, 0x41834000, 0xC8, 0x41838000, 0, 0x4185C000, 0x10, 0x41854000, 0xC8, 0x41858000, 0,
             0x4303C000, 0x14A528, 0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x4143C000, 0x22C,
             0x43034000, 0x16, 0x43020000, 0xC8, 0x43048000, 0x32, 0x43024000, 0, 0x41874000, 0x32, 0x41878000, 0x32,
@@ -342,7 +342,7 @@
         <!-- MPCTLV3_CPU_LLCC_BW_AB_SCALE  50  -->
         <!-- MPCTLV3_SCALING_MIN_FREQ_BIG  691MHz -->
         <Config
-            Id="0x00001335" Enable="true" Timeout="0" Target="canoe"
+            Id="0x00001335" Enable="true" Timeout="0" Target="canoe,whale"
             Resources="0x4183C000, 0x21, 0x41834000, 0xC8, 0x41838000, 0, 0x4185C000, 0x21, 0x41854000, 0xC8, 0x41858000, 0,
             0x41444000, 0, 0x41440000, 0x63, 0x43C0C000, 0, 0x41014000, 0, 0x4143C000, 0x2B3, 0x41000000, 3, 0x4100C000, 0x7,
             0x43034000, 0x21, 0x43020000, 0xC8, 0x43048000, 0x32, 0x43024000, 0, 0x41874000, 0x32, 0x41878000, 0x32,
@@ -370,7 +370,7 @@
         <!-- MPCTLV3_WALT_ADAPTIVE_LOW_FREQ_BIG resource opcode, 1324800 -->
         <!-- MPCTLV3_WALT_ADAPTIVE_LOW_FREQ_PRIME resource opcode, 1747200 -->
         <Config
-            Id="0x00001337" Enable="true" Timeout="1000" Target="canoe"
+            Id="0x00001337" Enable="true" Timeout="1000" Target="canoe,whale"
             Resources="0x40400000, 0x1, 0x40C00000, 0x0, 0x4080C000, 1747200, 0x4080C200, 2169600,
             0x40808000, 1324800, 0x40808200, 1632000"/>
 
@@ -382,7 +382,7 @@
         <!-- MPCTLV3_WALT_ADAPTIVE_LOW_FREQ_BIG resource opcode, 998400 -->
         <!-- MPCTLV3_WALT_ADAPTIVE_LOW_FREQ_PRIME resource opcode, 1632000 -->
         <Config
-            Id="0x00001338" Enable="true" Timeout="1000" Target="canoe"
+            Id="0x00001338" Enable="true" Timeout="1000" Target="canoe,whale"
             Resources="0x40400000, 0x1, 0x40C00000, 0x5, 0x4080C000, 1555200, 0x4080C200, 2169600,
             0x40808000, 998400, 0x40808200, 1632000"/>
 
@@ -393,7 +393,7 @@
         <!-- MPCTLV3_SCHED_DOWNMIGRATE, 0x14 -->
         <!-- MPCTLV3_SCHED_UPMIGRATE, 0x1E -->
         <Config
-            Id="0x00001339" Enable="true" Timeout="0" Target="canoe"
+            Id="0x00001339" Enable="true" Timeout="0" Target="canoe,whale"
             Resources="0x40400000, 0x1, 0x40800000, 0x553, 0x40C20000, 0x14, 0x40C1C000, 0x1E"/>
 
         <!--camera ZSLPreview-->
