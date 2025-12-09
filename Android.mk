@@ -6,7 +6,7 @@ ifeq ($(call is-vendor-board-platform,QCOM),true)
 # hw/<POWERS_HARDWARE_MODULE_ID>.<ro.hardware>.so
 include $(CLEAR_VARS)
 LOCAL_MODULE_RELATIVE_PATH := hw
-LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils libbinder_ndk android.hardware.power-V5-ndk
+LOCAL_SHARED_LIBRARIES := liblog libcutils libdl libxml2 libbase libutils libbinder_ndk android.hardware.power-V5-ndk android.hardware.common.fmq-V1-ndk libfmq
 LOCAL_HEADER_LIBRARIES += libutils_headers
 LOCAL_HEADER_LIBRARIES += libhardware_headers
 LOCAL_SRC_FILES := power-common.c metadata-parser.c utils.c list.c hint-data.c powerhintparser.c Power.cpp main.cpp PowerHintSession.cpp
@@ -15,6 +15,7 @@ LOCAL_C_INCLUDES := external/libxml2/include \
 
 ifeq ($(TARGET_SUPPORTS_WEAR_OS), true)
 LOCAL_CFLAGS += -DENABLE_POWER_HINT_FOR_WEAR
+LOCAL_CFLAGS += -DINTERACTION_BOOST
 endif
 
 ifeq ($(call is-board-platform-in-list,msm8937), true)
