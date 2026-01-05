@@ -31,6 +31,18 @@
 -->
 <HintConfigs>
     <Powerhint>
+        <!--sustained performance-->
+        <!-- B CPU - Cluster min freq uncapped -->
+        <!-- B CPU - Cluster max freq uncapped -->
+        <!-- L CPU - Cluster min freq ~.300GHz -->
+        <!-- L CPU - Cluster max freq ~.300GHz -->
+        <!-- GPU - min pwrlevel 4 (500Mhz) -->
+        <!-- GPU - max pwrlevel 3 (435Mhz)-->
+
+        <Config
+            Id="0x00001206" Enable="true" Target="sm6150_au" Timeout="0"
+            Resources="0x40800000, 0x0, 0x40804000, 0x0, 0x40800100, 0x12C, 0x40804100, 0x12C,
+            0x42804000, 0x4, 0x42808000, 0x3"/>
 
         <!-- camera 30fps and camera preview -->
         <!--L CPU CORE 0 SCHED LOAD BOOST -->
