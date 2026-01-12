@@ -39,6 +39,7 @@ typedef enum {
 
 // Scheduler (WALT window ticks)
 #define PERF_RES_SCHED_WINDOW           1008
+#define PERF_RES_SCHED_BOOST            1010
 
 // GPU / Graphics
 #define PERF_RES_GPU_MIN_PWR            1009
