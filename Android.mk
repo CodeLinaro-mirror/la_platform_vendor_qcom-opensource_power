@@ -26,6 +26,10 @@ ifeq ($(call is-board-platform-in-list,monaco), true)
 LOCAL_SRC_FILES += power-monaco.c
 endif
 
+ifeq ($(call is-board-platform-in-list,vienna), true)
+LOCAL_SRC_FILES += power-vienna.c
+endif
+
 ifeq ($(TARGET_USES_INTERACTION_BOOST),true)
 LOCAL_CFLAGS += -DINTERACTION_BOOST
 endif
