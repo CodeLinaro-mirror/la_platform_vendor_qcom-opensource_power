@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+ * Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+ * SPDX-License-Identifier: BSD-3-Clause-Clear
+-->
+<!-- This is a target specific resource config file which can be
+used to overwrite the node paths mentioned in common resources file
+and also to modify the Supported field information. -->
+<!-- This file supports only Config tag, which has the following fields
+* MajorValue and MinorValue, both are required to uniquely
+identify the resource.
+* Node, the new node path to overwrite the already existing path
+of commonresourceconfigs.xml file.
+* Supported, to indicate whether the resource is supported or not.
+* For each config tag, either of Node or Supported fields need
+to be mentioned.
+NOTE - It is not Mandatory to write all the resources which are not supported,
+as anyway perflock calls of these resources would fail. -->
+<HintConfigs>
+    <Powerhint>
+        <!-- camera video recode-->
+        <!--  set POWER COLLAPSE to disable  -->
+        <!--  enbale schedule boost mode -->
+        <!--  set cluster0 min freq to max -->
+        <!--  set cluster0 max freq to max -->
+        <Config
+            Id="0x00001331" Enable="true" Timeout="1000" Target="vienna"
+            Resources="0x40400000, 0x1, 0x40C00000, 0x1, 0x40800000, 0xFFF, 0x40804000, 0xFFF"/>
+        <!-- camera video 60FPS recode-->
+        <!--  set POWER COLLAPSE to disable  -->
+        <!--  enbale schedule boost mode -->
+        <!--  set cluster0 min freq to max -->
+        <!--  set cluster0 max freq to max -->
+        <Config
+            Id="0x00001332" Enable="true" Timeout="1000" Target="vienna"
+            Resources="0x40400000, 0x1, 0x40C00000, 0x1, 0x40800000, 0xFFF, 0x40804000, 0xFFF"/>
+    </Powerhint>
+</HintConfigs>
