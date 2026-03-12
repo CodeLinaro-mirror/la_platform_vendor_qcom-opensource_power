@@ -25,4 +25,8 @@ PRODUCT_COPY_FILES +=  vendor/qcom/opensource/power/config/msm8937/powerhint.xml
 endif # BOARD_OPENSOURCE_DIR
 else ifeq ($(TARGET_BOARD_PLATFORM),msm8953)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/msm8953/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
+else ifeq ($(TARGET_BOARD_PLATFORM),vienna)
+ifneq ($(TARGET_SUPPORTS_WEAR_ANDROID), ) # only for LAW
+PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/vienna/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
+endif
 endif
