@@ -18,7 +18,7 @@ else ifneq (,$(filter U 14,$(PLATFORM_VERSION)))
     LOCAL_VINTF_FRAGMENTS := power-v4.xml
     LOCAL_SRC_FILES := PowerHintSession.cpp
 
-else ifneq (,$(filter W 16,$(PLATFORM_VERSION)))
+else ifneq (,$(filter W 16 CinnamonBun 17,$(PLATFORM_VERSION)))
     LOCAL_SHARED_LIBRARIES += android.hardware.power-V6-ndk \
                               libcutils \
                               libfmq \
