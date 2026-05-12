@@ -103,6 +103,7 @@ ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
     switch(type){
         case Mode::LOW_POWER:
         case Mode::DEVICE_IDLE:
+        case Mode::DISPLAY_INACTIVE:
             power_hint(POWER_HINT_LOW_POWER, (void*)&state);
             break;
         case Mode::LAUNCH:
@@ -116,7 +117,6 @@ ndk::ScopedAStatus Power::setMode(Mode type, bool enabled) {
         case Mode::FIXED_PERFORMANCE:
             power_hint(POWER_HINT_SUSTAINED_PERFORMANCE, (void*)&state);
             break;
-        case Mode::DISPLAY_INACTIVE:
         case Mode::DOUBLE_TAP_TO_WAKE:
         case Mode::VR:
         case Mode::EXPENSIVE_RENDERING:
