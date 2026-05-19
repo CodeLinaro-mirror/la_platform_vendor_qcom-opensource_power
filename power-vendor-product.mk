@@ -30,7 +30,9 @@ PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/pitti/powerhint.xml:$(
 else ifeq ($(TARGET_BOARD_PLATFORM),volcano)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/volcano/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 else ifeq ($(TARGET_BOARD_PLATFORM),niobe)
+ifneq ($(TARGET_DEFINES_AXR_CONFIGURATION), true)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/niobe/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
+endif
 else ifeq ($(TARGET_BOARD_PLATFORM),neo61)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/neo61/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 else ifeq ($(TARGET_BOARD_PLATFORM),seraph)
