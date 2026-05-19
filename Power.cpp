@@ -160,8 +160,10 @@ ndk::ScopedAStatus Power::setBoost(Boost type, int32_t durationMs) {
 
 #ifdef ENABLE_POWER_HINT_FOR_WEAR
     switch(type) {
-        case Boost::DISPLAY_UPDATE_IMMINENT:
         case Boost::INTERACTION:
+            if(durationMs == 0)
+                durationMs = 250;
+        case Boost::DISPLAY_UPDATE_IMMINENT:
             if(durationMs > 1) {
                 power_hint(POWER_HINT_INTERACTION, (void*)&durationMs);
             }

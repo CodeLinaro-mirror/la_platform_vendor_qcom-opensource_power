@@ -15,6 +15,7 @@ const std::unordered_map<int32_t, NodeConfig> NODE_DB = {
     {1005, {"/sys/devices/system/cpu/cpu0/core_ctl/min_cpus",           "",                                             ArbitratorPolicy::MAX_VALUE}},
     {1008, {"/proc/sys/walt/sched_ravg_window_nr_ticks",                "vendor.power.walt.sched_ravg_window_nr_ticks", ArbitratorPolicy::MAX_VALUE}},
     {1009, {"/sys/class/kgsl/kgsl-3d0/min_pwrlevel",                    "",                                             ArbitratorPolicy::MIN_VALUE}}, // lower index = higher perf
+    {1010, {"/proc/sys/walt/sched_boost",                               "vendor.power.walt.sched_boost",                ArbitratorPolicy::MAX_VALUE}},
 };
 
 } // namespace perf
