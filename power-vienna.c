@@ -35,6 +35,7 @@ void interaction(int duration, int num_args, int opt_list[]);
  */
 int power_hint_override(power_hint_t hint, void *data)
 {
+#ifdef ENABLE_POWER_HINT_FOR_WEAR
 	int enabled = 0;
 	int duration = 0;
 	static int low_power_hint_acquired;
@@ -107,7 +108,7 @@ int power_hint_override(power_hint_t hint, void *data)
 			ALOGD("Power Hint: %d Not Supported", hint);
 			break;
 	}
-
+#endif
     return HINT_HANDLED;
 }
 
