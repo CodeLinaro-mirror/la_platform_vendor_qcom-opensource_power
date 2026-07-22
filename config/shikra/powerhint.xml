@@ -37,65 +37,167 @@
 -->
 <HintConfigs>
     <Powerhint>
-        <!-- camera preview -->
-        <!--Sched boost -->
-        <!--Big cluster min/max 1900Mhz -->
-        <!--Silver cores min/max 1804Mhz -->
-        <!--DDR min/max 1804Mhz -->
+        <!--Camera preview boost-->
+        <!-- SCHEDBOOST resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_FREQ LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD BIG Core resource opcode, value -->
+        <!-- LLCC_DDR_BW_SAMPLE_MS resource opcode, value -->
+        <!-- LLCC_DDR_BW_IO_PERCENT resource opcode, value -->
+        <!-- LLCC_DDR_BW_UP_SCALE resource opcode, value -->
+        <!-- LLCC_DDR_BW_AB_SCALE resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ LITTLE Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ LITTLE Core resource opcode, value -->
+        <!-- MPCTLV3_BUS_DCVS_LLCC_DDR_BOOST_FREQ resource opcode, value -->
+        <!-- CLUSTR_1_CPUS_ON resource opcode, value -->
+        <!-- CPUCTL_FG_UCLAMP_LATENCY_SENSITIVE resource opcode, value -->
+
         <Config
             Id="0x00001330" Enable="true" Timeout="0" Target="shikra"
-            Resources="0x40C00000, 0x1,
-            0x4143C100, 1094, 0x41440100, 0x63, 0x41440000, 0x63,
-            0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0, 0x43048000, 0x32,
-            0x40804000, 1900, 0x40800000, 1900,
-            0x40800100, 1804, 0x40800110, 1804, 0x40800120, 1804,
-            0x40804100, 1804, 0x40804110, 1804, 0x40804120, 1804,
-            0x43010000, 1804, 0x43018000, 1804"/>
+            Resources="0x40C00000, 0x1, 0x4143C100, 1094, 0x41440100, 0x63, 0x41440000, 0x63,
+            0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0, 0x43048000, 0x32, 0x40804000, 1900, 0x40800000, 1900,
+            0x40804100, 1804, 0x40800100, 1804, 0x43498000, 1804000, 0x41000100, 0x1, 0x40CEC000, 0x1" />
 
         <!-- camera 30fps -->
-        <!--Sched boost -->
-        <!--Big cluster min/max 1900Mhz -->
-        <!--Silver cores min/max 1804Mhz -->
-        <!--DDR min/max 1804Mhz -->
+        <!-- SCHEDBOOST resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_FREQ LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD BIG Core resource opcode, value -->
+        <!-- LLCC_DDR_BW_SAMPLE_MS resource opcode, value -->
+        <!-- LLCC_DDR_BW_IO_PERCENT resource opcode, value -->
+        <!-- LLCC_DDR_BW_UP_SCALE resource opcode, value -->
+        <!-- LLCC_DDR_BW_AB_SCALE resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ LITTLE Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ LITTLE Core resource opcode, value -->
+        <!-- MPCTLV3_BUS_DCVS_LLCC_DDR_BOOST_FREQ resource opcode, value -->
+        <!-- CLUSTR_1_CPUS_ON resource opcode, value -->
+        <!-- CPUCTL_FG_UCLAMP_LATENCY_SENSITIVE resource opcode, value -->
+
         <Config
             Id="0x00001331" Enable="true" Timeout="0" Target="shikra"
-            Resources="0x40C00000, 0x1,
-            0x41440100, 0x5F, 0x41440000, 0x5F,
-            0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0,
-            0x40CEC000, 0x1, 0x43048000, 0x32,
-            0x40804000, 1900, 0x40800000, 1900,
-            0x40800100, 1804, 0x40800110, 1804, 0x40800120, 1804,
-            0x40804100, 1804, 0x40804110, 1804, 0x40804120, 1804,
-            0x43010000, 1804, 0x43018000, 1804"/>
+            Resources="0x40C00000, 0x1, 0x4143C100, 1094, 0x41440100, 0x63, 0x41440000, 0x63,
+            0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0, 0x43048000, 0x32, 0x40804000, 1900, 0x40800000, 1900,
+            0x40804100, 1804, 0x40800100, 1804, 0x43498000, 1804000, 0x41000100, 0x1, 0x40CEC000, 0x1" />
 
         <!-- camera 60 FPS -->
-        <!--Sched boost -->
-        <!--Big cluster min/max 1900Mhz -->
-        <!--Silver cores min/max 1804Mhz -->
-        <!--DDR min/max 1804Mhz -->
+        <!-- SCHEDBOOST resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_FREQ LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD BIG Core resource opcode, value -->
+        <!-- LLCC_DDR_BW_SAMPLE_MS resource opcode, value -->
+        <!-- LLCC_DDR_BW_IO_PERCENT resource opcode, value -->
+        <!-- LLCC_DDR_BW_UP_SCALE resource opcode, value -->
+        <!-- LLCC_DDR_BW_AB_SCALE resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ LITTLE Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ LITTLE Core resource opcode, value -->
+        <!-- MPCTLV3_BUS_DCVS_LLCC_DDR_BOOST_FREQ resource opcode, value -->
+        <!-- CLUSTR_1_CPUS_ON resource opcode, value -->
+        <!-- CPUCTL_FG_UCLAMP_LATENCY_SENSITIVE resource opcode, value -->
+
         <Config
-            Id="04shx1,
-            0x4143C100, 1094 0x41440100, 0x5F, 0x41440000, 0x5F,
-            0x43034000, 0x14, 0x43048000, 0x32,
-            0x40804000, 1900, 0x40800000, 1900,
-            0x40800100, 1804, 0x40800110, 1804, 0x40800120, 1804,
-            0x40804100, 1804, 0x40804110, 1804, 0x40804120, 1804,
-            0x43010000, 1804, 0x43018000, 1804"/>
+            Id="0x00001332" Enable="true" Timeout="0" Target="shikra"
+            Resources="0x40C00000, 0x1, 0x4143C100, 1094, 0x41440100, 0x63, 0x41440000, 0x63,
+            0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0, 0x43048000, 0x32, 0x40804000, 1900, 0x40800000, 1900,
+            0x40804100, 1804, 0x40800100, 1804, 0x43498000, 1804000, 0x41000100, 0x1, 0x40CEC000, 0x1" />
+
+        <!-- camera HFR -->
+        <!-- SCHEDBOOST resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_FREQ LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD BIG Core resource opcode, value -->
+        <!-- LLCC_DDR_BW_SAMPLE_MS resource opcode, value -->
+        <!-- LLCC_DDR_BW_IO_PERCENT resource opcode, value -->
+        <!-- LLCC_DDR_BW_UP_SCALE resource opcode, value -->
+        <!-- LLCC_DDR_BW_AB_SCALE resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ LITTLE Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ LITTLE Core resource opcode, value -->
+        <!-- MPCTLV3_BUS_DCVS_LLCC_DDR_BOOST_FREQ resource opcode, value -->
+        <!-- CLUSTR_1_CPUS_ON resource opcode, value -->
+        <!-- CPUCTL_FG_UCLAMP_LATENCY_SENSITIVE resource opcode, value -->
+
+        <Config
+            Id="0x00001333" Enable="true" Timeout="0" Target="shikra"
+            Resources="0x40C00000, 0x1, 0x4143C100, 1094, 0x41440100, 0x63, 0x41440000, 0x63,
+            0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0, 0x43048000, 0x32, 0x40804000, 1900, 0x40800000, 1900,
+            0x40804100, 1804, 0x40800100, 1804, 0x43498000, 1804000, 0x41000100, 0x1, 0x40CEC000, 0x1" />
 
         <!-- HFR 480fps -->
-        <!--Sched boost -->
-        <!--Big cluster min/max 1900Mhz -->
-        <!--Silver cores min/max 1804Mhz -->
-        <!--DDR min/max 1804Mhz -->
+        <!-- SCHEDBOOST resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_FREQ LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD BIG Core resource opcode, value -->
+        <!-- LLCC_DDR_BW_SAMPLE_MS resource opcode, value -->
+        <!-- LLCC_DDR_BW_IO_PERCENT resource opcode, value -->
+        <!-- LLCC_DDR_BW_UP_SCALE resource opcode, value -->
+        <!-- LLCC_DDR_BW_AB_SCALE resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ LITTLE Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ LITTLE Core resource opcode, value -->
+        <!-- MPCTLV3_BUS_DCVS_LLCC_DDR_BOOST_FREQ resource opcode, value -->
+        <!-- CLUSTR_1_CPUS_ON resource opcode, value -->
+        <!-- CPUCTL_FG_UCLAMP_LATENCY_SENSITIVE resource opcode, value -->
+
         <Config
             Id="0x00001334" Enable="true" Timeout="0" Target="shikra"
-            Resources="0x40C00000, 0x1,
-            0x4143C100, 1094, 0x41440100, 0x5F, 0x41440000, 0x5F,
-            0x43034000, 0x14, 0x41000100, 1,
-            0x40804000, 1900, 0x40800000, 1900,
-            0x40800100, 1804, 0x40800110, 1804, 0x40800120, 1804,
-            0x40804100, 1804, 0x40804110, 1804, 0x40804120, 1804,
-            0x43010000, 1804, 0x43018000, 1804"/>
+            Resources="0x40C00000, 0x1, 0x4143C100, 1094, 0x41440100, 0x63, 0x41440000, 0x63,
+            0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0, 0x43048000, 0x32, 0x40804000, 1900, 0x40800000, 1900,
+            0x40804100, 1804, 0x40800100, 1804, 0x43498000, 1804000, 0x41000100, 0x1, 0x40CEC000, 0x1" />
+
+        <!-- camera 8k_30fps -->
+        <!-- SCHEDBOOST resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_FREQ LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD BIG Core resource opcode, value -->
+        <!-- LLCC_DDR_BW_SAMPLE_MS resource opcode, value -->
+        <!-- LLCC_DDR_BW_IO_PERCENT resource opcode, value -->
+        <!-- LLCC_DDR_BW_UP_SCALE resource opcode, value -->
+        <!-- LLCC_DDR_BW_AB_SCALE resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ LITTLE Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ LITTLE Core resource opcode, value -->
+        <!-- MPCTLV3_BUS_DCVS_LLCC_DDR_BOOST_FREQ resource opcode, value -->
+        <!-- CLUSTR_1_CPUS_ON resource opcode, value -->
+        <!-- CPUCTL_FG_UCLAMP_LATENCY_SENSITIVE resource opcode, value -->
+
+        <Config
+            Id="0x00001335" Enable="true" Timeout="0" Target="shikra"
+            Resources="0x40C00000, 0x1, 0x4143C100, 1094, 0x41440100, 0x63, 0x41440000, 0x63,
+            0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0, 0x43048000, 0x32, 0x40804000, 1900, 0x40800000, 1900,
+            0x40804100, 1804, 0x40800100, 1804, 0x43498000, 1804000, 0x41000100, 0x1, 0x40CEC000, 0x1" />
+
+        <!-- multi camera 30fps -->
+        <!-- SCHEDBOOST resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_FREQ LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD LITTLE Core resource opcode, value -->
+        <!-- SCHEDUTIL_HISPEED_LOAD BIG Core resource opcode, value -->
+        <!-- LLCC_DDR_BW_SAMPLE_MS resource opcode, value -->
+        <!-- LLCC_DDR_BW_IO_PERCENT resource opcode, value -->
+        <!-- LLCC_DDR_BW_UP_SCALE resource opcode, value -->
+        <!-- LLCC_DDR_BW_AB_SCALE resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ BIG Core resource opcode, value -->
+        <!-- CPUBOOST_MAX_FREQ LITTLE Core resource opcode, value -->
+        <!-- CPUBOOST_MIN_FREQ LITTLE Core resource opcode, value -->
+        <!-- MPCTLV3_BUS_DCVS_LLCC_DDR_BOOST_FREQ resource opcode, value -->
+        <!-- CLUSTR_1_CPUS_ON resource opcode, value -->
+        <!-- CPUCTL_FG_UCLAMP_LATENCY_SENSITIVE resource opcode, value -->
+
+        <Config
+            Id="0x00001336" Enable="true" Timeout="0" Target="shikra"
+            Resources="0x40C00000, 0x1, 0x4143C100, 1094, 0x41440100, 0x63, 0x41440000, 0x63,
+            0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0, 0x43048000, 0x32, 0x40804000, 1900, 0x40800000, 1900,
+            0x40804100, 1804, 0x40800100, 1804, 0x43498000, 1804000, 0x41000100, 0x1, 0x40CEC000, 0x1" />
+
 
         <!-- same settings for all the qvr power levels intentionally -->
         <!-- qvr level cpu1 gpu1 -->
@@ -253,26 +355,6 @@
              Id="0x00001301" Enable="true" Timeout="0" Target="shikra"
              Resources="0x40800000, 0x4CC, 0x40800100, 0x4CC, 0x40804000, 0x4CC, 0x40804100, 0x4CC,
              0X4280C000, 0x190, 0X42810000, 0x190, 0x42814000, 0x0"/>
-
-        <!-- multi camera 30fps -->
-        <!--Sched boost -->
-        <!--Big cluster min/max 1900Mhz -->
-        <!--Silver cores min/max 1804Mhz -->
-        <!--DDR min/max 1804Mhz -->
-        <!--CPUBW HWMON - Set sample_ms 48 -->
-        <!--CPUBW HWMON - Set io_percent 100 -->
-        <!--CPUBW HWMON - Set up_scale 0 -->
-        <!--Gold CPU core ctl min cpus 1 -->
-        <!--Set uclamp latency sensitivity to 1 -->
-        <Config
-            Id="0x00001336" Enable="true" Timeout="0" Target="shikra"
-            Resources="0x40C00000, 0x1,
-            0x40804000, 1900, 0x40800000, 1900,
-            0x40800100, 1804, 0x40800110, 1804, 0x40800120, 1804,
-            0x40804100, 1804, 0x40804110, 1804, 0x40804120, 1804,
-            0x43010000, 1804, 0x43018000, 1804,
-            0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0,
-            0x41000100, 1, 0x40CEC000, 0x1"/>
 
     </Powerhint>
 </HintConfigs>
