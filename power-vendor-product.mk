@@ -25,6 +25,8 @@ else ifeq ($(TARGET_BOARD_PLATFORM),sun)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/sun/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 else ifeq ($(TARGET_BOARD_PLATFORM),blair)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/holi/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
+else ifeq ($(TARGET_BOARD_PLATFORM)$(TARGET_BOARD_SUFFIX),pitti_wear32)
+PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/pitti_wear32/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 else ifeq ($(TARGET_BOARD_PLATFORM),pitti)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/pitti/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 else ifeq ($(TARGET_BOARD_PLATFORM),volcano)
