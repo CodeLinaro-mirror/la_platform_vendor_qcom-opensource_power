@@ -47,4 +47,6 @@ else ifeq ($(TARGET_BOARD_PLATFORM),seraph)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/seraph/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 else ifeq ($(TARGET_BOARD_PLATFORM),pikachu)
 PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/pikachu/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
+else ifeq ($(TARGET_BOARD_PLATFORM),shikra)
+PRODUCT_COPY_FILES += vendor/qcom/opensource/power/config/shikra/powerhint.xml:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.xml
 endif
