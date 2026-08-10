@@ -94,7 +94,7 @@
         <!-- AB scale 50-->
         <!--L CPU min freq 921Mhz -->
         <!--L CPU max freq 1632Mhz -->
-        <!-- GPU - min pwrlevel 8 (freq 326 Mhz) -->
+        <!-- GPU - min pwrlevel 7 (freq 390 Mhz) -->
         <!--MPCTLV3_SCHED_BG_UPDOWNMIGRATE - 55 50-->
         <!--MPCTLV3_SCHED_FG_UPDOWNMIGRATE - 55 50-->
         <!--MPCTLV3_SCHED_OT_UPDOWNMIGRATE - 55 50-->
@@ -103,7 +103,7 @@
             Id="0x00001331" Enable="true" Timeout="0" Target="bourtzi"
             Resources="0x40C68100, -10, 0x40C68000, -10,
             0x41440100, 0x5F, 0x41440000, 0x5F, 0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0,
-            0x40CEC000, 0x1, 0x43048000, 0x32, 0x40800100, 921, 0x40804100, 1632, 0x42804000, 0x8, 0x43C74100, 0x00370032, 0x43C78100, 0x00370032, 0x43C7C100, 0x00370032, 0x43C80100, 0x00370032"/>
+            0x40CEC000, 0x1, 0x43048000, 0x32, 0x40800100, 921, 0x40804100, 1632, 0x42804000, 0x7, 0x43C74100, 0x00370032, 0x43C78100, 0x00370032, 0x43C7C100, 0x00370032, 0x43C80100, 0x00370032"/>
 
         <!--camera 60fps-->
         <!--CPU-LLC-DDR BWMON - Set sample_ms 16 -->
