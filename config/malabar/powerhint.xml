@@ -55,10 +55,14 @@
         <!-- AB scale 50-->
         <!-- CPUBW HWMON - Set io_percent 100 -->
         <!--L CPU max freq 1286Mhz -->
+        <!--MPCTLV3_SCHED_BG_UPDOWNMIGRATE - 60 55-->
+        <!--MPCTLV3_SCHED_FG_UPDOWNMIGRATE - 60 55-->
+        <!--MPCTLV3_SCHED_OT_UPDOWNMIGRATE - 60 55-->
+        <!--MPCTLV3_SCHED_TA_UPDOWNMIGRATE - 60 55-->
         <Config
             Id="0x00001332" Enable="true" Timeout="0" Target="malabar"
             Resources="0x40C68100, -10, 0x40C68000, -10, 0x41440100, 0x5F, 0x41440000, 0x5F, 0x43034000, 0x14, 0x40CEC000, 0x1, 0x43048000, 0x32,
-            0x43020000, 0x64, 0x40804100, 1286"/>
+            0x43020000, 0x64, 0x40804100, 1286 , 0x43C74100, 0x003C0037, 0x43C78100, 0x003C0037, 0x43C7C100, 0x003C0037, 0x43C80100, 0x003C0037"/>
 
         <!-- camera HFR -->
         <!--L CPU CORE 0 SCHED LOAD BOOST -->

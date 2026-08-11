@@ -9,6 +9,7 @@
 #include "utils.h"
 #include <dlfcn.h>
 #include <cmath>
+#include <algorithm>
 #include <android-base/logging.h>
 #include <android/binder_manager.h>
 #include "android/binder_auto_utils.h"
