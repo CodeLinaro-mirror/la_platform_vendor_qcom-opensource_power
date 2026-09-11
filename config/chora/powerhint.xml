@@ -503,5 +503,10 @@
              Resources="0x40800000, 0x4CC, 0x40800100, 0x4CC, 0x40804000, 0x4CC, 0x40804100, 0x4CC,
              0X4280C000, 0x190, 0X42810000, 0x190, 0x42814000, 0x0"/>
 
+        <!--camera MVP-->
+        <!-- MPCTLV3_CGROUPS_CAMERA_FRAMEWORK_FEATURES 1 -->
+        <Config
+            Id="0x00001341" Enable="true" Timeout="0" Target="bourtzi"
+            Resources="0x42C84000, 0x1"/>
     </Powerhint>
 </HintConfigs>
