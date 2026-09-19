@@ -45,13 +45,11 @@
         <!--CPUBW HWMON - Set io_percent 100 -->
         <!--CPUBW HWMON - Set up_scale 0 -->
         <!-- AB scale 50 -->
-        <!--L CPU CORE 1 - Set to online -->
-        <!--L CPU CORE 3 - Set to online -->
         <Config
             Id="0x00001330" Enable="true" Timeout="0" Target="pitti_wear32"
             Resources="0x40C68100, -15,
             0x4143C100, 1094, 0x41440100, 0x63, 0x43034000, 0x30, 0x43020000,
-            0x64, 0x43014000, 0x0, 0x43048000, 0x32, 0x41018110, 0x1, 0x41018130, 0x1"/>
+            0x64, 0x43014000, 0x0, 0x43048000, 0x32"/>
 
         <!-- camera 30fps-->
         <!--L CPU CORE 0 SCHED LOAD BOOST -->
@@ -61,13 +59,11 @@
         <!--CPUBW HWMON - Set up_scale 0 -->
         <!--Set uclamp latency sensitivity to 1 -->
         <!-- AB scale 50-->
-        <!--L CPU CORE 1 - Set to online -->
-        <!--L CPU CORE 3 - Set to online -->
         <Config
             Id="0x00001331" Enable="true" Timeout="0" Target="pitti_wear32"
             Resources="0x40C68100, -10,
             0x41440100, 0x5F, 0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0,
-            0x40CEC000, 0x1, 0x43048000, 0x32, 0x41018110, 0x1, 0x41018130, 0x1"/>
+            0x40CEC000, 0x1, 0x43048000, 0x32"/>
 
 
         <!-- camera 60 FPS -->
@@ -77,13 +73,11 @@
         <!--Set uclamp latency sensitivity to 1 -->
         <!-- AB scale 50-->
         <!-- CPUBW HWMON - Set io_percent 100 -->
-        <!--L CPU CORE 1 - Set to online -->
-        <!--L CPU CORE 3 - Set to online -->
         <Config
             Id="0x00001332" Enable="true" Timeout="0" Target="pitti_wear32"
             Resources="0x40C68100, -10,
             0x41440100, 0x5F, 0x43034000, 0x14, 0x40CEC000, 0x1, 0x43048000, 0x32,
-            0x43020000, 0x64, 0x41018110, 0x1, 0x41018130, 0x1"/>
+            0x43020000, 0x64"/>
 
 
         <!-- camera HFR -->
@@ -92,12 +86,10 @@
         <!--L CLUSTER_LITTLE - Set hispeed load 95 -->
         <!--CPUBW HWMON - Set sample_ms 20 -->
         <!-- AB scale 50-->
-        <!--L CPU CORE 1 - Set to online -->
-        <!--L CPU CORE 3 - Set to online -->
         <Config
             Id="0x00001333" Enable="true" Timeout="0" Target="pitti_wear32"
             Resources="0x40C68100, -10, 0x4143C100, 1094, 0x41440100,
-            0x5F, 0x43034000, 0x14, 0x43048000, 0x32, 0x41018110, 0x1, 0x41018130, 0x1"/>
+            0x5F, 0x43034000, 0x14, 0x43048000, 0x32"/>
 
 
         <!-- HFR 480fps -->
@@ -106,12 +98,10 @@
         <!--L CLUSTER_LITTLE - Set hispeed load 95 -->
         <!--CPUBW HWMON - Set sample_ms 20 -->
         <!--L CPU core ctl min cpus 6 -->
-        <!--L CPU CORE 1 - Set to online -->
-        <!--L CPU CORE 3 - Set to online -->
         <Config
             Id="0x00001334" Enable="true" Timeout="0" Target="pitti_wear32"
             Resources="0x40C68100, 0xFFFFFFFA, 0x4143C100, 1094, 0x41440100,
-            0x5F, 0x43034000, 0x14, 0x41000100, 6, 0x41018110, 0x1, 0x41018130, 0x1"/>
+            0x5F, 0x43034000, 0x14, 0x41000100, 6"/>
 
 
 
@@ -138,15 +128,11 @@
         <!--CPUBW HWMON - Set up_scale 0 -->
         <!--L CPU core ctl min cpus 6 -->
         <!--Set uclamp latency sensitivity to 1 -->
-        <!--L CPU CORE 1 - Set to online -->
-        <!--L CPU CORE 3 - Set to online -->
-        <!--B CPU CORE 6 - Set to online -->
-        <!--B CPU CORE 7 - Set to online -->
         <Config
             Id="0x00001336" Enable="true" Timeout="0" Target="pitti_wear32"
             Resources="0x40C68100, -10,
             0x40800100, 1094, 0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0, 0x41000100, 6,
-            0x40CEC000, 0x1, 0x41018110, 0x1, 0x41018130, 0x1, 0x41018000, 0x1, 0x41018010, 0x1"/>
+            0x40CEC000, 0x1"/>
 
     </Powerhint>
 </HintConfigs>
