@@ -48,21 +48,27 @@
             Resources="0x43034000, 0x21, 0x43024000, 0, 0x41444100, 0, 0x41440100, 0x63, 0x40804100, 0x459, 0x41000000, 4,
             0x40C68100, -10, 0x40C68000, -10, 0x40CF4000, 0x00190014, 0x43C74100, 0x00190014, 0x43C78100, 0x00190014, 0x43C7C100, 0x00190014, 0x43C80100, 0x00190014"/>
 
-        <!--L CPU CORE 0 SCHED LOAD BOOST -->
-        <!--L CPU CORE 6 SCHED LOAD BOOST -->
+        <!--L CPU CORE 0 SCHED LOAD BOOST 0 -->
+        <!--L CPU CORE 6 SCHED LOAD BOOST 0 -->
         <!--L CPU Hispeed freq of 1094Mhz -->
         <!--L CLUSTER_LITTLE - Set hispeed load 99 -->
         <!--L CLUSTER_BIG - Set hispeed load 99 -->
-        <!--CPUBW HWMON - Set sample_ms 48 -->
+        <!--CPUBW HWMON - Set sample_ms 33 -->
         <!--CPUBW HWMON - Set io_percent 100 -->
         <!--CPUBW HWMON - Set up_scale 0 -->
         <!-- AB scale 50 -->
-        <!--L CPU max freq 1286Mhz -->
+        <!--L CPU min freq 921Mhz -->
+        <!--L CPU max freq 1632Mhz -->
+        <!-- GPU - min pwrlevel 7 (freq 390 Mhz) -->
+        <!--MPCTLV3_SCHED_BG_UPDOWNMIGRATE - 50 45-->
+        <!--MPCTLV3_SCHED_FG_UPDOWNMIGRATE - 50 45-->
+        <!--MPCTLV3_SCHED_OT_UPDOWNMIGRATE - 50 45-->
+        <!--MPCTLV3_SCHED_TA_UPDOWNMIGRATE - 50 45-->
         <Config
             Id="0x00001330" Enable="true" Timeout="0" Target="bourtzi"
-            Resources="0x40C68100, -15, 0x40C68000, -15,
-            0x4143C100, 1094, 0x41440100, 0x63, 0x41440000, 0x63, 0x43034000, 0x30, 0x43020000,
-            0x64, 0x43014000, 0x0, 0x43048000, 0x32, 0x40804100, 1286"/>
+            Resources="0x40C68100, 0, 0x40C68000, 0,
+            0x4143C100, 1094, 0x41440100, 0x63, 0x41440000, 0x63, 0x43034000, 0x21, 0x43020000,
+            0x64, 0x43014000, 0x0, 0x43048000, 0x32, 0x40800100, 921, 0x40804100, 1632, 0x42804000, 0x7, 0x43C74100, 0x0032002D, 0x43C78100, 0x0032002D, 0x43C7C100, 0x0032002D, 0x43C80100, 0x0032002D"/>
 
         <!--camera 30fps-->
         <!--CPU-LLC-DDR BWMON - Set sample_ms 33 -->
@@ -83,8 +89,8 @@
             0x40C68100, -10, 0x40C68000, -10, 0x40804100, 0x459, 0x41440100, 0x63,
             0x43C74100, 0x00190014, 0x43C78100, 0x00190014, 0x43C7C100, 0x00190014, 0x43C80100, 0x00190014"/>
 
-        <!--L CPU CORE 0 SCHED LOAD BOOST -->
-        <!--L CPU CORE 6 SCHED LOAD BOOST -->
+        <!--L CPU CORE 0 SCHED LOAD BOOST 0 -->
+        <!--L CPU CORE 6 SCHED LOAD BOOST 0 -->
         <!--L CLUSTER_LITTLE - Set hispeed load 95 -->
         <!--L CLUSTER_BIG - Set hispeed load 95 -->
         <!--CPUBW HWMON - Set sample_ms 48 -->
@@ -101,7 +107,7 @@
         <!--MPCTLV3_SCHED_TA_UPDOWNMIGRATE - 55 50-->
         <Config
             Id="0x00001331" Enable="true" Timeout="0" Target="bourtzi"
-            Resources="0x40C68100, -10, 0x40C68000, -10,
+            Resources="0x40C68100, 0, 0x40C68000, 0,
             0x41440100, 0x5F, 0x41440000, 0x5F, 0x43034000, 0x30, 0x43020000, 0x64, 0x43014000, 0x0,
             0x40CEC000, 0x1, 0x43048000, 0x32, 0x40800100, 921, 0x40804100, 1632, 0x42804000, 0x7, 0x43C74100, 0x00370032, 0x43C78100, 0x00370032, 0x43C7C100, 0x00370032, 0x43C80100, 0x00370032"/>
 
@@ -124,8 +130,8 @@
             Resources="0x43034000, 0x10, 0x43020000, 0x64, 0x43024000, 0, 0x4303C000, 0x14A528,  0x43048000, 0x32, 0x40804100, 0x459, 0x41000000, 4,
             0x40C68100, -10, 0x40C68000, -10, 0x41440000, 0x63, 0x43C74100, 0x00190014, 0x43C78100, 0x00190014, 0x43C7C100, 0x00190014, 0x43C80100, 0x00190014"/>
 
-        <!--L CPU CORE 0 SCHED LOAD BOOST -->
-        <!--L CPU CORE 6 SCHED LOAD BOOST -->
+        <!--L CPU CORE 0 SCHED LOAD BOOST 0 -->
+        <!--L CPU CORE 6 SCHED LOAD BOOST 0 -->
         <!--L CLUSTER_LITTLE - Set hispeed load 95 -->
         <!--L CLUSTER_BIG - Set hispeed load 95 -->
         <!--CPUBW HWMON - Set sample_ms 20 -->
@@ -133,14 +139,15 @@
         <!-- AB scale 50-->
         <!-- CPUBW HWMON - Set io_percent 100 -->
         <!--L CPU max freq 1286Mhz -->
+        <!-- GPU - min pwrlevel 7 (freq 390 Mhz) -->
         <!--MPCTLV3_SCHED_BG_UPDOWNMIGRATE - 60 55-->
         <!--MPCTLV3_SCHED_FG_UPDOWNMIGRATE - 60 55-->
         <!--MPCTLV3_SCHED_OT_UPDOWNMIGRATE - 60 55-->
         <!--MPCTLV3_SCHED_TA_UPDOWNMIGRATE - 60 55-->
         <Config
             Id="0x00001332" Enable="true" Timeout="0" Target="bourtzi"
-            Resources="0x40C68100, -10, 0x40C68000, -10, 0x41440100, 0x5F, 0x41440000, 0x5F, 0x43034000, 0x14, 0x40CEC000, 0x1, 0x43048000, 0x32,
-            0x43020000, 0x64, 0x40804100, 1286 , 0x43C74100, 0x003C0037, 0x43C78100, 0x003C0037, 0x43C7C100, 0x003C0037, 0x43C80100, 0x003C0037"/>
+            Resources="0x40C68100, 0, 0x40C68000, 0, 0x41440100, 0x5F, 0x41440000, 0x5F, 0x43034000, 0x14, 0x40CEC000, 0x1, 0x43048000, 0x32,
+            0x43020000, 0x64, 0x40804100, 1286 , 0x43C74100, 0x003C0037, 0x43C78100, 0x42804000, 0x7, 0x003C0037, 0x43C7C100, 0x003C0037, 0x43C80100, 0x003C0037"/>
 
         <!-- camera HFR -->
         <!--CPU-LLC-DDR BWMON - Set sample_ms 16 -->
