@@ -38,25 +38,12 @@
 <HintConfigs>
 	<Powerhint>
         <!--Camera preview boost-->
-        <!-- SCHEDBOOST resource opcode, value -->
-        <!-- SCHEDUTIL_HISPEED_FREQ LITTLE Core resource opcode, value -->
-        <!-- SCHEDUTIL_HISPEED_LOAD LITTLE Core resource opcode, value -->
-        <!-- SCHEDUTIL_HISPEED_LOAD BIG Core resource opcode, value -->
-        <!-- LLCC_DDR_BW_SAMPLE_MS resource opcode, value -->
-        <!-- LLCC_DDR_BW_IO_PERCENT resource opcode, value -->
-        <!-- LLCC_DDR_BW_UP_SCALE resource opcode, value -->
-        <!-- LLCC_DDR_BW_AB_SCALE resource opcode, value -->
-        <!-- CPUBOOST_MAX_FREQ BIG Core resource opcode, value -->
-        <!-- CPUBOOST_MIN_FREQ BIG Core resource opcode, value -->
-        <!-- CPUBOOST_MAX_FREQ LITTLE Core resource opcode, value -->
-        <!-- CPUBOOST_MIN_FREQ LITTLE Core resource opcode, value -->
-        <!-- MPCTLV3_BUS_DCVS_LLCC_DDR_BOOST_FREQ resource opcode, value -->
-        <!-- CLUSTR_1_CPUS_ON resource opcode, value -->
-        <!-- CPUCTL_FG_UCLAMP_LATENCY_SENSITIVE resource opcode, value -->
-
+        <!--Gold MAX Capped at 768Mhz -->
+        <!--Memlat DDR to Silver CPU Max Capped at 1.5Ghz -->
+       
         <Config
             Id="0x00001330" Enable="true" Timeout="0" Target="shikra"
-            Resources=" " />
+            Resources="0x434B4000, 1555000" />
 
         <!-- camera 30fps -->
         <!-- SCHEDBOOST resource opcode, value -->
